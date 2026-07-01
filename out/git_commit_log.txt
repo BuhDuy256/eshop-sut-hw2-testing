@@ -1,0 +1,3 @@
+This file should contain the full git commit log for this assignment.
+
+Populate it at the end with: git log --oneline > out/git_commit_log.txt

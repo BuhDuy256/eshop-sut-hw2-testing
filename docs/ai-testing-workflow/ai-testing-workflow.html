@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Testing Agent — Full Workflow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Courier New', monospace;
+  background: #0d1117;
+  color: #e6edf3;
+  padding: 24px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ── TITLE ── */
+.title-block {
+  text-align: center;
+  border: 2px solid #58a6ff;
+  border-radius: 6px;
+  padding: 12px 20px;
+  margin-bottom: 6px;
+  background: #0d1f3c;
+}
+.title-block h1 { font-size: 16px; color: #58a6ff; letter-spacing: 1px; }
+.title-block p  { font-size: 11px; color: #8b949e; margin-top: 4px; }
+
+.warning-bar {
+  text-align: center;
+  border: 1px dashed #f85149;
+  border-radius: 4px;
+  padding: 5px;
+  margin-bottom: 14px;
+  color: #ffa198;
+  font-size: 11px;
+  background: rgba(248,81,73,0.05);
+}
+
+/* ── OUTER GRID ── */
+.outer {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 14px;
+  align-items: start;
+}
+
+/* ── INPUTS ── */
+.inputs-block {
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  padding: 10px 12px;
+  background: #161b22;
+  margin-bottom: 8px;
+}
+.inputs-block .label { font-weight: bold; color: #c9d1d9; margin-bottom: 6px; font-size: 12px; }
+.inputs-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+.input-card {
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 6px;
+  text-align: center;
+  background: #0d1117;
+}
+.input-card .name { color: #79c0ff; font-weight: bold; font-size: 10px; }
+.input-card .sub  { color: #8b949e; font-size: 9px; margin: 2px 0; }
+.badge-req { background:#0d2a1a; color:#2ea043; border:1px solid #2ea043; border-radius:8px; padding:1px 6px; font-size:9px; }
+.badge-opt { background:#21262d; color:#8b949e; border:1px solid #30363d; border-radius:8px; padding:1px 6px; font-size:9px; }
+
+/* ── ARROW ── */
+.arrow { text-align:center; color:#30363d; font-size:20px; margin:4px 0; }
+.arrow-label { text-align:center; color:#8b949e; font-size:9px; margin-top:-4px; margin-bottom:4px; }
+
+/* ── PHASE BOX ── */
+.phase {
+  border: 2px solid;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.ph0 { border-color:#1f6feb; background:#08152b; }
+.ph1 { border-color:#2ea043; background:#081a0e; }
+.ph2 { border-color:#d29922; background:#1a1208; }
+.ph3 { border-color:#8957e5; background:#120820; }
+.ph4 { border-color:#f85149; background:#1a0808; }
+
+.phase-header {
+  display:flex; align-items:center; gap:8px; margin-bottom:10px;
+}
+.phase-tag {
+  display:inline-block; border-radius:4px; padding:3px 10px;
+  font-size:12px; font-weight:bold; white-space:nowrap;
+}
+.tag0 { background:#1f6feb; color:#fff; }
+.tag1 { background:#2ea043; color:#fff; }
+.tag2 { background:#d29922; color:#0d1117; }
+.tag3 { background:#8957e5; color:#fff; }
+.tag4 { background:#f85149; color:#fff; }
+
+.phase-sub { font-size:10px; color:#8b949e; }
+
+/* ── INNER GRIDS ── */
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.g4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; }
+
+/* ── INNER BOX ── */
+.ibox {
+  border:1px solid #21262d;
+  border-radius:4px;
+  padding:8px;
+  background:rgba(255,255,255,0.02);
+}
+.ibox-title {
+  font-size:10px; font-weight:bold; margin-bottom:5px;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.c0 { color:#79c0ff; } .c1 { color:#56d364; }
+.c2 { color:#e3b341; } .c3 { color:#bc8cff; }
+.c4 { color:#ffa198; }
+
+.ibox ul { list-style:none; padding:0; }
+.ibox ul li { color:#c9d1d9; margin-bottom:2px; font-size:10px; }
+.ibox ul li::before { content:'▸ '; color:#8b949e; }
+
+/* output box tinted */
+.out0 { border-color:#1f6feb; background:rgba(31,111,235,0.08); }
+.out1 { border-color:#2ea043; background:rgba(46,160,67,0.08); }
+.out2 { border-color:#d29922; background:rgba(210,153,34,0.08); }
+.out3 { border-color:#8957e5; background:rgba(137,87,229,0.08); }
+.out4 { border-color:#f85149; background:rgba(248,81,73,0.08); }
+
+/* ── CONFLICT ROW ── */
+.conflict-row {
+  display:flex; gap:6px; flex-wrap:wrap; margin:6px 0;
+}
+.cf-box {
+  border:1px solid; border-radius:3px;
+  padding:4px 8px; font-size:10px;
+}
+.cf-ok  { border-color:#2ea043; color:#56d364; }
+.cf-err { border-color:#f85149; color:#ffa198; }
+
+/* ── CONFIDENCE BADGES ── */
+.conf-row { display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+.conf-item { display:flex; align-items:center; gap:6px; font-size:10px; }
+.cb { display:inline-block; padding:1px 7px; border-radius:8px; font-weight:bold; font-size:10px; }
+.cb-h { background:#f85149; color:#fff; }
+.cb-m { background:#d29922; color:#0d1117; }
+.cb-l { background:#238636; color:#fff; }
+
+/* ── PASS/FAIL ── */
+.pf-row { display:flex; gap:6px; margin-top:6px; }
+.pass-box { flex:1; border:1px solid #2ea043; border-radius:3px; padding:4px; text-align:center; color:#56d364; font-size:10px; }
+.fail-box { flex:1; border:1px solid #f85149; border-radius:3px; padding:4px; text-align:center; color:#ffa198; font-size:10px; }
+
+/* ── ORACLE WARNING ── */
+.oracle-warn {
+  margin-top:6px; font-size:10px; color:#f85149;
+  border:1px solid #f85149; border-radius:3px; padding:4px 6px;
+}
+
+/* ── KNOWLEDGE BASE ── */
+.kb-block {
+  border:2px solid #58a6ff; border-radius:6px;
+  padding:12px; margin-top:8px; background:#08132b;
+}
+.kb-title { font-size:13px; font-weight:bold; color:#58a6ff; text-align:center; margin-bottom:8px; }
+.kb-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+.kb-card {
+  border:1px solid #1f6feb; border-radius:4px;
+  padding:7px; background:rgba(31,111,235,0.07);
+}
+.kb-card .kname { color:#79c0ff; font-weight:bold; font-size:10px; margin-bottom:4px; }
+.kb-card div   { color:#8b949e; font-size:9px; margin-bottom:1px; }
+.kb-card div::before { content:'/ '; }
+
+/* ── FEEDBACK LOOPS ── */
+.loops-block {
+  border:1px solid #d29922; border-radius:5px;
+  padding:10px 12px; margin-top:8px;
+  background:rgba(210,153,34,0.04);
+}
+.loops-title { color:#d29922; font-weight:bold; font-size:12px; margin-bottom:8px; }
+.short-loops { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px; }
+.loop-item {
+  border:1px dashed #d29922; border-radius:3px;
+  padding:5px 7px; font-size:10px; color:#d29922;
+}
+.loop-item span { color:#8b949e; }
+.restart-block {
+  border:1px solid #f85149; border-radius:4px;
+  padding:7px 10px; background:rgba(248,81,73,0.05);
+}
+.restart-title { color:#f85149; font-weight:bold; font-size:11px; margin-bottom:5px; }
+.restart-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; font-size:10px; color:#ffa198; }
+.restart-grid div::before { content:'⟳ '; }
+
+/* ── CONSTRAINTS ── */
+.constraints-block {
+  border:1px solid #8957e5; border-radius:5px;
+  padding:10px 12px; margin-top:8px;
+  background:rgba(137,87,229,0.04);
+}
+.constraints-title { color:#8957e5; font-weight:bold; font-size:12px; margin-bottom:6px; }
+.constraints-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+.constraint-item { font-size:10px; color:#c9d1d9; }
+.constraint-item::before { content:'✓ '; color:#8957e5; }
+
+/* ── DELIVERABLES ── */
+.deliv-block {
+  border:1px solid #30363d; border-radius:5px;
+  padding:10px 12px; margin-top:8px; background:#161b22;
+}
+.deliv-title { font-weight:bold; color:#c9d1d9; font-size:12px; margin-bottom:6px; }
+.deliv-tags  { display:flex; flex-wrap:wrap; gap:5px; }
+.deliv-tag {
+  border:1px solid; border-radius:3px; padding:2px 7px; font-size:10px;
+}
+.dt0 { border-color:#2ea043; color:#56d364; }
+.dt1 { border-color:#d29922; color:#e3b341; }
+.dt2 { border-color:#f85149; color:#ffa198; }
+.dt3 { border-color:#8957e5; color:#bc8cff; }
+.dt4 { border-color:#58a6ff; color:#79c0ff; }
+.dt5 { border-color:#30363d; color:#8b949e; }
+
+/* ── HUMAN-IN-THE-LOOP COLUMN ── */
+.hitl-col { }
+.hitl-header {
+  text-align:center; border:2px solid #f85149; border-radius:5px;
+  padding:8px; margin-bottom:10px; background:rgba(248,81,73,0.07);
+  color:#f85149; font-weight:bold; font-size:13px;
+}
+.hitl-header small { display:block; font-size:9px; color:#ffa198; font-weight:normal; margin-top:2px; }
+
+.hitl-card {
+  border:1px solid #f85149; border-radius:5px;
+  padding:9px; margin-bottom:8px;
+  background:rgba(248,81,73,0.04);
+}
+.hitl-card-title {
+  color:#f85149; font-weight:bold; font-size:10px;
+  border-bottom:1px solid rgba(248,81,73,0.3);
+  padding-bottom:4px; margin-bottom:6px;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.hitl-card ul { list-style:none; padding:0; }
+.hitl-card ul li { color:#ffa198; font-size:10px; margin-bottom:2px; }
+.hitl-card ul li::before { content:'✓ '; color:#f85149; }
+
+.abbr-block {
+  border:1px dashed #30363d; border-radius:5px;
+  padding:9px; margin-top:8px; background:#0d1117;
+}
+.abbr-title { color:#58a6ff; font-weight:bold; font-size:10px; margin-bottom:5px; }
+.abbr-row { color:#8b949e; font-size:9px; margin-bottom:2px; }
+.abbr-row b { color:#c9d1d9; }
+
+/* ── SEPARATOR ── */
+.sep { height:1px; background:#21262d; margin:6px 0; }
+
+/* model+oracle note */
+.mo-note {
+  font-size:9px; color:#d29922; font-style:italic;
+  margin-bottom:4px;
+}
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>AI TESTING AGENT — FULL WORKFLOW WITH CONTROLLED LEARNING</h1>
+  <p>HW02 – Domain Testing on EShop &nbsp;|&nbsp; Controlled Learning System (NOT a self-learning agent)</p>
+</div>
+<div class="warning-bar">
+  ⚠ &nbsp; MODEL ≠ ORACLE &nbsp;·&nbsp; Expected Results always from Spec &nbsp;·&nbsp; No knowledge update without Human Approval &nbsp;·&nbsp; All AI outputs must be reviewed by human
+</div>
+
+<div class="outer">
+
+  <!-- ════════════ MAIN FLOW ════════════ -->
+  <div>
+
+    <!-- INPUTS -->
+    <div class="inputs-block">
+      <div class="label">▸ INPUTS</div>
+      <div class="inputs-row">
+        <div class="input-card">
+          <div class="name">Feature ID</div>
+          <div class="sub">FR-04, FR-08…</div>
+          <span class="badge-req">REQUIRED</span>
+        </div>
+        <div class="input-card">
+          <div class="name">Repository</div>
+          <div class="sub">EShop source code</div>
+          <span class="badge-req">REQUIRED</span>
+        </div>
+        <div class="input-card">
+          <div class="name">Internal Spec</div>
+          <div class="sub">SRS / FRD / README</div>
+          <span class="badge-opt">IF AVAILABLE</span>
+        </div>
+        <div class="input-card">
+          <div class="name">External Ref</div>
+          <div class="sub">Standards / Regulations</div>
+          <span class="badge-opt">IF NEEDED</span>
+        </div>
+        <div class="input-card">
+          <div class="name">Existing Tests</div>
+          <div class="sub">Docs / Logs</div>
+          <span class="badge-opt">IF AVAILABLE</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- PHASE 0 -->
+    <div class="phase ph0">
+      <div class="phase-header">
+        <span class="phase-tag tag0">PHASE 0</span>
+        <div>
+          <div style="font-size:13px; font-weight:bold; color:#79c0ff;">Feature Discovery</div>
+          <div class="phase-sub">Map the feature in the repository before any analysis</div>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="ibox">
+          <div class="ibox-title c0">DISCOVER</div>
+          <ul>
+            <li>Routes / Endpoints</li>
+            <li>Controllers / Handlers</li>
+            <li>Services / Use Cases</li>
+            <li>Models / Entities</li>
+            <li>Database Tables</li>
+            <li>Middleware / Guards</li>
+            <li>Shared Utilities / Helpers</li>
+            <li>Existing Tests & Docs</li>
+            <li>External Integrations</li>
+          </ul>
+        </div>
+        <div class="ibox">
+          <div class="ibox-title c0">ANALYZE & BUILD</div>
+          <ul>
+            <li>Call Graph</li>
+            <li>Data Flow</li>
+            <li>Control Flow</li>
+            <li>Dependency Map</li>
+            <li>Execution Sequence</li>
+            <li>Auth / Middleware Chain</li>
+            <li>Entry & Exit Points</li>
+            <li>Layer Classification</li>
+          </ul>
+        </div>
+        <div class="ibox out0">
+          <div class="ibox-title c0">OUTPUT</div>
+          <ul>
+            <li>Feature Dependency Graph</li>
+            <li>Feature Map (file list)</li>
+            <li>Execution Flow Diagram</li>
+            <li>Entry Points & Boundaries</li>
+            <li>Related Artifacts</li>
+            <li>Auth / Middleware Map</li>
+            <li>Layer Map (Logic/DB/Auth…)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- PHASE 1 -->
+    <div class="phase ph1">
+      <div class="phase-header">
+        <span class="phase-tag tag1">PHASE 1</span>
+        <div>
+          <div style="font-size:13px; font-weight:bold; color:#56d364;">SRE — Specification Recovery & Static Analysis</div>
+          <div class="phase-sub">Reverse-engineer behavior from code, compare with spec, detect conflicts</div>
+        </div>
+      </div>
+      <div class="g2">
+        <!-- left: analysis + confidence -->
+        <div>
+          <div class="ibox" style="margin-bottom:8px">
+            <div class="ibox-title c1">STATIC ANALYSIS</div>
+            <ul>
+              <li>Parse & Understand Spec</li>
+              <li>Static Code Analysis (per layer)</li>
+              <li>Extract Business Rules</li>
+              <li>Extract Validation Rules</li>
+              <li>Extract Input Domains</li>
+              <li>Infer State / Workflow Rules</li>
+              <li>Map Auth / Authorization Logic</li>
+            </ul>
+          </div>
+          <div class="ibox">
+            <div class="ibox-title c1">CONFIDENCE SCORE (per item)</div>
+            <div class="conf-row">
+              <div class="conf-item"><span class="cb cb-h">HIGH</span> Code/spec clear, 1:1 match, no inference</div>
+              <div class="conf-item"><span class="cb cb-m">MED</span>  Complex logic, inference required</div>
+              <div class="conf-item"><span class="cb cb-l">LOW</span>  Ambiguous / no spec / runtime branches unverified</div>
+            </div>
+          </div>
+        </div>
+        <!-- right: conflict flow + output -->
+        <div>
+          <div class="ibox" style="margin-bottom:8px">
+            <div class="ibox-title c1">REQUIREMENT COMPARISON & CONFLICT DETECTION</div>
+            <div class="conflict-row">
+              <div class="cf-box cf-ok">NO CONFLICT → Continue to Phase 2</div>
+              <div class="cf-box cf-err">CONFLICT DETECTED → Classify below</div>
+            </div>
+            <ul>
+              <li>Likely Implementation Bug</li>
+              <li>Likely Specification Bug</li>
+              <li>Both Wrong / Ambiguous</li>
+              <li>Need Human Review</li>
+            </ul>
+            <div style="margin-top:6px; font-size:9px; color:#8b949e; border:1px dashed #30363d; padding:4px; border-radius:3px;">
+              External Reference Lookup — used <b style="color:#f85149">ONLY</b> when conflict is confirmed.<br>
+              Must be recorded and referenced in AI Audit Report.
+            </div>
+          </div>
+          <div class="ibox out1">
+            <div class="ibox-title c1">OUTPUT</div>
+            <ul>
+              <li>Recovered Requirements</li>
+              <li>Input Domains (from code)</li>
+              <li>Business Rules (from code)</li>
+              <li>Validation Rules (from code)</li>
+              <li>State / Workflow Rules</li>
+              <li>Bug Candidates + Confidence Score</li>
+              <li>Requirement Conflicts Report</li>
+              <li>Need External Validation? (Y/N)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- PHASE 2 -->
+    <div class="phase ph2">
+      <div class="phase-header">
+        <span class="phase-tag tag2">PHASE 2</span>
+        <div>
+          <div style="font-size:13px; font-weight:bold; color:#e3b341;">Domain Test Design (EP + BVA)</div>
+          <div class="phase-sub">Design test cases using domain partitioning; Expected Results from Spec only</div>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="ibox">
+          <div class="ibox-title c2">MODEL (from Phase 1)</div>
+          <div class="mo-note">Decides WHAT to test</div>
+          <ul>
+            <li>Recovered Requirements</li>
+            <li>Input Domains</li>
+            <li>Business Rules</li>
+            <li>State / Workflow Rules</li>
+            <li>Bug Candidates (targeting only)</li>
+          </ul>
+          <div class="sep"></div>
+          <div class="ibox-title c2" style="margin-top:4px">TECHNIQUES</div>
+          <ul>
+            <li>Equivalence Partitioning (EP)</li>
+            <li>Boundary Value Analysis (BVA)</li>
+            <li>Decision Table (for rules)</li>
+            <li>State Transition Testing</li>
+            <li>Pairwise / Combination</li>
+            <li>Risk-based Prioritization</li>
+          </ul>
+        </div>
+        <div class="ibox">
+          <div class="ibox-title c2">ORACLE (from Spec)</div>
+          <div class="mo-note">Decides WHAT is correct</div>
+          <ul>
+            <li>Internal Spec (SRS/FRD/README)</li>
+            <li>External Ref (if conflict resolved in Ph1)</li>
+            <li>Business Rules / Product Policy</li>
+            <li>Acceptance Criteria</li>
+          </ul>
+          <div class="oracle-warn">
+            ⚠ NEVER derive Expected Results<br>from implementation (code).<br>
+            Bug Candidates = targeting only, not oracle.
+          </div>
+        </div>
+        <div class="ibox out2">
+          <div class="ibox-title c2">OUTPUT</div>
+          <ul>
+            <li>EP Table (per variable)</li>
+            <li>BVA Table (ordered fields)</li>
+            <li>Decision Table (for rules)</li>
+            <li>State Transition Table</li>
+            <li>Test Cases (steps, data, expected)</li>
+            <li>Test Data Sets</li>
+            <li>Coverage Report (EP/BVA/DT/State)</li>
+            <li>Traceability Matrix (Req ↔ TC)</li>
+            <li>Risk & Priority</li>
+            <li>Assumptions Log</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- PHASE 3 -->
+    <div class="phase ph3">
+      <div class="phase-header">
+        <span class="phase-tag tag3">PHASE 3</span>
+        <div>
+          <div style="font-size:13px; font-weight:bold; color:#bc8cff;">Test Execution & Bug Reporting</div>
+          <div class="phase-sub">Runtime pipeline — execute against SUT, collect evidence, report bugs</div>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="ibox">
+          <div class="ibox-title c3">EXECUTION DISPATCHER</div>
+          <div style="color:#8957e5; font-weight:bold; font-size:10px; margin:5px 0 3px">API Testing (Automated)</div>
+          <ul>
+            <li>HTTP Requests</li>
+            <li>Assertions</li>
+            <li>Response Validation</li>
+            <li>DB State Verification</li>
+          </ul>
+          <div style="color:#8957e5; font-weight:bold; font-size:10px; margin:6px 0 3px">UI Testing (Browser / Playwright)</div>
+          <ul>
+            <li>Navigate & Interact</li>
+            <li>Assertions</li>
+            <li>Visual Validation</li>
+          </ul>
+        </div>
+        <div class="ibox">
+          <div class="ibox-title c3">COLLECT EVIDENCE</div>
+          <ul>
+            <li>Actual Result</li>
+            <li>Logs / Stack Traces</li>
+            <li>Screenshots / Videos</li>
+            <li>Response / Payloads</li>
+            <li>DB State / Audit</li>
+          </ul>
+          <div class="sep"></div>
+          <div class="ibox-title c3" style="margin-top:4px">COMPARE (Expected vs Actual)</div>
+          <div class="pf-row">
+            <div class="pass-box">✓ PASS<br><span style="font-size:9px">Record Result</span></div>
+            <div class="fail-box">✗ FAIL<br><span style="font-size:9px">→ Bug Confirm</span></div>
+          </div>
+          <div style="margin-top:6px; font-size:9px; color:#8b949e">
+            FAIL → Confirm & Reproduce → Severity / Priority → Root Cause
+          </div>
+        </div>
+        <div class="ibox out3">
+          <div class="ibox-title c3">OUTPUT</div>
+          <ul>
+            <li>Executed Test Results</li>
+            <li>Screenshots & Logs</li>
+            <li>Confirmed Bugs</li>
+            <li>GitHub Issues (Markdown)</li>
+            <li>Bug Reports (MD)</li>
+            <li>Severity / Priority</li>
+            <li>Root Cause (if known)</li>
+            <li>Test Summary Report</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">↓</div>
+
+    <!-- PHASE 4 -->
+    <div class="phase ph4">
+      <div class="phase-header">
+        <span class="phase-tag tag4">PHASE 4</span>
+        <div>
+          <div style="font-size:13px; font-weight:bold; color:#ffa198;">Human-Approved Learning & Knowledge Refinement</div>
+          <div class="phase-sub">Controlled learning system — no autonomous update, all changes require human approval</div>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="ibox">
+          <div class="ibox-title c4">INPUTS</div>
+          <ul>
+            <li>Human Feedback (reviews, comments)</li>
+            <li>Execution History (pass/fail, bugs)</li>
+            <li>Assumption Decisions (accepted/rejected)</li>
+            <li>False Positives / Negatives</li>
+            <li>Requirement Conflicts resolved</li>
+          </ul>
+        </div>
+        <div class="ibox">
+          <div class="ibox-title c4">LEARNING ACTIVITIES</div>
+          <ul>
+            <li>Pattern Mining</li>
+            <li>Root Cause Analysis</li>
+            <li>Prompt Improvement</li>
+            <li>Rule Refinement</li>
+            <li>Test Strategy Update</li>
+            <li>SKILL.md Update</li>
+          </ul>
+          <div style="margin-top:6px; font-size:9px; color:#f85149; border:1px solid #f85149; padding:4px; border-radius:3px;">
+            All changes require human approval<br>before committing to Knowledge Base.
+          </div>
+        </div>
+        <div class="ibox out4">
+          <div class="ibox-title c4">OUTPUT → Knowledge Base</div>
+          <ul>
+            <li>Updated assumptions.md</li>
+            <li>Updated bug-patterns.md</li>
+            <li>Updated prompt-library.md</li>
+            <li>Updated test-patterns.md</li>
+            <li>Updated lessons-learned.md</li>
+            <li>Updated SKILL.md</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- KNOWLEDGE BASE -->
+    <div class="kb-block">
+      <div class="kb-title">📚 KNOWLEDGE BASE — Markdown Files in Repository (/knowledge/)</div>
+      <div class="kb-grid">
+        <div class="kb-card">
+          <div class="kname">assumptions.md</div>
+          <div>Proposed</div>
+          <div>Accepted</div>
+          <div>Rejected</div>
+          <div>Pending</div>
+        </div>
+        <div class="kb-card">
+          <div class="kname">bug-patterns.md</div>
+          <div>Confirmed bugs</div>
+          <div>False positives</div>
+          <div>Patterns</div>
+          <div>Root causes</div>
+        </div>
+        <div class="kb-card">
+          <div class="kname">prompt-library.md</div>
+          <div>Effective prompts</div>
+          <div>Anti-patterns</div>
+          <div>Improvements</div>
+          <div>Templates</div>
+        </div>
+        <div class="kb-card">
+          <div class="kname">test-patterns.md</div>
+          <div>Boundaries</div>
+          <div>Validations</div>
+          <div>Workflows</div>
+          <div>Business rules</div>
+        </div>
+        <div class="kb-card">
+          <div class="kname">lessons-learned.md</div>
+          <div>What worked</div>
+          <div>What didn't</div>
+          <div>Recommendations</div>
+          <div>Best practices</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK LOOPS -->
+    <div class="loops-block">
+      <div class="loops-title">↺ FEEDBACK LOOPS</div>
+      <div style="font-size:10px; color:#8b949e; margin-bottom:6px">SHORT LOOPS — within current feature, no full restart:</div>
+      <div class="short-loops">
+        <div class="loop-item">Phase 3 FAIL <span>→</span> Phase 2<br>Refine / add test cases</div>
+        <div class="loop-item">Phase 2 assumption conflict <span>→</span> Phase 1<br>Review requirement</div>
+        <div class="loop-item">Phase 1 missing dependency <span>→</span> Phase 0<br>Rediscover files</div>
+        <div class="loop-item">Phase 4 lesson approved <span>→</span> SKILL.md / prompt library<br>Update Knowledge Base</div>
+      </div>
+      <div class="restart-block">
+        <div class="restart-title">FULL RESTART from Phase 0 — only when:</div>
+        <div class="restart-grid">
+          <div>New feature selected</div>
+          <div>Dependency graph incomplete</div>
+          <div>Major spec / code change found</div>
+          <div>Execution reveals unexplained bug pattern</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEY CONSTRAINTS -->
+    <div class="constraints-block">
+      <div class="constraints-title">KEY CONSTRAINTS (Applied in All Phases)</div>
+      <div class="constraints-grid">
+        <div class="constraint-item">MODEL ≠ ORACLE: Never derive Expected Results from implementation</div>
+        <div class="constraint-item">External Reference used ONLY when Phase 1 confirms conflict</div>
+        <div class="constraint-item">Every AI output must be reviewed by human (HITL)</div>
+        <div class="constraint-item">All assumptions must be logged in assumptions.md</div>
+        <div class="constraint-item">No knowledge update accepted without human approval</div>
+        <div class="constraint-item">All AI usage must be recorded in AI Audit Report</div>
+      </div>
+    </div>
+
+    <!-- FINAL DELIVERABLES -->
+    <div class="deliv-block">
+      <div class="deliv-title">FINAL DELIVERABLES (HW02)</div>
+      <div class="deliv-tags">
+        <span class="deliv-tag dt0">Domain Testing Report</span>
+        <span class="deliv-tag dt0">BVA Report</span>
+        <span class="deliv-tag dt1">AI Gap Analysis</span>
+        <span class="deliv-tag dt2">Bug Reports (MD)</span>
+        <span class="deliv-tag dt2">GitHub Issues</span>
+        <span class="deliv-tag dt3">Test Summary Report</span>
+        <span class="deliv-tag dt4">AI Audit Report</span>
+        <span class="deliv-tag dt4">AI Critique (200–300w)</span>
+        <span class="deliv-tag dt4">Agent Skills + Demo Videos</span>
+        <span class="deliv-tag dt5">README.md (Self-assessment)</span>
+        <span class="deliv-tag dt5">Git Commit Log</span>
+      </div>
+    </div>
+
+  </div><!-- end main flow -->
+
+  <!-- ════════════ HUMAN-IN-THE-LOOP COLUMN ════════════ -->
+  <div class="hitl-col">
+
+    <div class="hitl-header">
+      👤 HUMAN-IN-THE-LOOP
+      <small>Review & Decision — Mandatory at every phase</small>
+    </div>
+
+    <div class="hitl-card">
+      <div class="hitl-card-title">Phase 0 — Review Discovery</div>
+      <ul>
+        <li>Check file completeness</li>
+        <li>Add missing files / modules</li>
+        <li>Correct dependency errors</li>
+        <li>Verify entry points</li>
+      </ul>
+    </div>
+
+    <div class="hitl-card">
+      <div class="hitl-card-title">Phase 1 — Review Requirements</div>
+      <ul>
+        <li>Validate recovered requirements</li>
+        <li>Confirm / challenge conflicts</li>
+        <li>Provide missing spec info</li>
+        <li>Approve confidence scores</li>
+        <li>Decide conflict resolution</li>
+        <li>Confirm oracle source</li>
+        <li>Approve external reference use</li>
+      </ul>
+    </div>
+
+    <div class="hitl-card">
+      <div class="hitl-card-title">Phase 2 — Review Test Design</div>
+      <ul>
+        <li>Validate EP / BVA tables</li>
+        <li>Validate test cases</li>
+        <li>Confirm assumptions</li>
+        <li>Adjust / add test cases</li>
+        <li>Confirm oracle correctness</li>
+        <li>Review coverage report</li>
+        <li>Confirm traceability</li>
+      </ul>
+    </div>
+
+    <div class="hitl-card">
+      <div class="hitl-card-title">Phase 3 — Review Execution & Bugs</div>
+      <ul>
+        <li>Confirm bug validity</li>
+        <li>Add / review evidence</li>
+        <li>Close as false positive</li>
+        <li>Set severity & priority</li>
+        <li>Approve GitHub Issues</li>
+        <li>Review test summary</li>
+      </ul>
+    </div>
+
+    <div class="hitl-card">
+      <div class="hitl-card-title">Phase 4 — Review Learning Outputs</div>
+      <ul>
+        <li>Confirm patterns</li>
+        <li>Accept / reject rules</li>
+        <li>Suggest improvements</li>
+        <li>Add domain knowledge</li>
+        <li>Approve SKILL.md updates</li>
+        <li>Sign off KB changes</li>
+      </ul>
+    </div>
+
+    <div class="abbr-block">
+      <div class="abbr-title">ABBREVIATIONS</div>
+      <div class="abbr-row"><b>SRE</b> — Specification Recovery Engine</div>
+      <div class="abbr-row"><b>SRS</b> — Software Requirements Spec</div>
+      <div class="abbr-row"><b>FRD</b> — Functional Requirements Doc</div>
+      <div class="abbr-row"><b>SUT</b> — System Under Test</div>
+      <div class="abbr-row"><b>EP</b> — Equivalence Partitioning</div>
+      <div class="abbr-row"><b>BVA</b> — Boundary Value Analysis</div>
+      <div class="abbr-row"><b>DT</b> — Decision Table</div>
+      <div class="abbr-row"><b>KB</b> — Knowledge Base</div>
+      <div class="abbr-row"><b>HITL</b> — Human In The Loop</div>
+      <div class="abbr-row"><b>TC</b> — Test Case</div>
+      <div class="abbr-row"><b>EC</b> — Equivalence Class</div>
+    </div>
+
+  </div><!-- end hitl col -->
+
+</div><!-- end outer -->
+
+</body>
+</html>
