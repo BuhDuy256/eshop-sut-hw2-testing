@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eshop-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - eshop-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/products"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend-web:
+    build:
+      context: ./frontend-web
+      dockerfile: Dockerfile
+    container_name: eshop-frontend-web
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    networks:
+      - eshop-network
+    volumes:
+      - ./frontend-web:/app
+      - /app/node_modules
+
+  frontend-admin:
+    build:
+      context: ./frontend-admin
+      dockerfile: Dockerfile
+    container_name: eshop-frontend-admin
+    ports:
+      - "5174:5174"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    networks:
+      - eshop-network
+    volumes:
+      - ./frontend-admin:/app
+      - /app/node_modules
+
+  frontend-mobile:
+    build:
+      context: ./frontend-mobile
+      dockerfile: Dockerfile
+    container_name: eshop-frontend-mobile
+    ports:
+      - "8081:8081"
+      - "19000:19000"
+      - "19001:19001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - EXPO_NO_TUNNEL=1
+    networks:
+      - eshop-network
+    volumes:
+      - ./frontend-mobile:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+
+networks:
+  eshop-network:
+    driver: bridge
