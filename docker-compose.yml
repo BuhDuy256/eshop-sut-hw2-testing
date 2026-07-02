@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -13,7 +11,8 @@ services:
     networks:
       - eshop-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/products"]
+      test:
+        ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/products"]
       interval: 10s
       timeout: 5s
       retries: 5
