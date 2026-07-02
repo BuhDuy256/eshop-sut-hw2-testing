@@ -246,7 +246,7 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 
 | Step | State |
 |---|---|
-| 0 Blockers | [ ] |
+| 0 Blockers | [x] |
 | 1 Execution viability | [ ] |
 | 2 Oracle precedence | [ ] |
 | 3 FR-08 smoke | [ ] |
@@ -256,4 +256,4 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 
 ## > NEXT ACTION
 
-**Do Step 0** — send the TA the scope question and confirm the GitHub Issues repo; record both in `docs/implementation-plan/blockers.md`. Then set Step 0 to done and Next Action to Step 1.
+**Do Step 1** — validate execution viability (Model C): `docker-compose up --build`, log in as both test accounts, execute one authed request, confirm reseed is idempotent, and record the working execution command form in `docs/implementation-plan/execution-notes.md`.
