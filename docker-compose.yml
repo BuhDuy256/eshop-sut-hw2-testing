@@ -13,7 +13,7 @@ services:
     networks:
       - eshop-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/products"]
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/products"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -71,6 +71,11 @@ services:
         condition: service_healthy
     environment:
       - EXPO_NO_TUNNEL=1
+      # LAN IP of the host machine, so a physical device (Expo Go) can reach
+      # both the Metro bundler and the backend API. Override via a .env file
+      # (HOST_LAN_IP=x.x.x.x) if this machine's Wi-Fi IP changes.
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${HOST_LAN_IP:-172.20.10.3}
+      - EXPO_PUBLIC_API_URL=http://${HOST_LAN_IP:-172.20.10.3}:3000/api
     networks:
       - eshop-network
     volumes:

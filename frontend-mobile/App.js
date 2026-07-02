@@ -13,7 +13,9 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
-const API_URL = "http://192.168.10.13:3000/api"; // IP LAN để chạy được trên iOS/Android và thiết bị thật
+// IP LAN để chạy được trên iOS/Android và thiết bị thật.
+// Set qua biến môi trường EXPO_PUBLIC_API_URL (xem docker-compose.yml) khi đổi mạng.
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.10.13:3000/api";
 
 const formatMoney = (value) => `${Number(value).toLocaleString()} ₫`;
 
