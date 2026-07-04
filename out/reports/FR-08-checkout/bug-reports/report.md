@@ -1,11 +1,14 @@
 # FR-08 — Bug Report
 
 > Scope note: this report holds the Step-3 vertical-smoke bug (`BUG-08-001`) plus the
-> Continuation FR-08 Full pass below (`BUG-08-002..005`), added 2026-07-04. None filed as
-> GitHub issues — attempting to file `BUG-08-002` via `gh issue create` returned "the
-> 'BuhDuy256/eshop-sut-hw2-testing' repository has disabled issues," a harder blocker than
-> Step 0's "`gh` not installed" (which has since resolved — `gh` is now installed and
-> authenticated). All 4 promote with local evidence only, per the plan's documented fallback.
+> Continuation FR-08 Full pass below (`BUG-08-002..005`), added 2026-07-04. All 5 were
+> originally promoted with local evidence only — GitHub issue filing was blocked (first by
+> `gh` not being installed at Step 0, then by the repository having Issues disabled entirely).
+> **Update 2026-07-04 (later the same day):** Issues have been enabled on the repository and
+> `gh` is authenticated; all 5 approved reports below have now been filed verbatim as GitHub
+> issues (#1–#5), with no change to any technical content (title, severity, priority,
+> expected, actual, repro, root cause, or evidence) — only the `GitHub Issue` field per bug was
+> updated.
 
 ## BUG-08-001 — Checkout persists client-forged `total_amount` instead of the server-recomputed cart total
 
@@ -14,7 +17,7 @@
 | **Severity** | Critical — `total_amount` is the SUT's sole financial record for an order: it is what the admin revenue dashboard aggregates for `status = 'delivered'` orders (`README.md` line 183) and the only recorded amount owed for the order. Evidence proves this field is 100% attacker-controlled with zero server-side validation, for any authenticated user, on any order — a complete failure of the one rule (`README.md` FR-08 line 107) that exists specifically to prevent it, with no compensating control elsewhere in the checkout flow. Note: this SUT has no separate payment-gateway charge step to observe: severity is assessed against the order's financial-record integrity (and its downstream use in revenue reporting), not against an independently verified real-money charge event. |
 | **Priority** | P1 |
 | **Ref** | `TC-08-001` (`out/reports/FR-08-checkout/domain-testing/report.md`) |
-| **GitHub Issue** | Not filed — `gh` CLI unavailable in this environment (see `docs/implementation-plan/blockers.md`, 0.2). Approved draft + local evidence only, per the plan's documented fallback. |
+| **GitHub Issue** | [#1](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/1) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-08 line 107, oracle — see `docs/implementation-plan/oracle-precedence.md`):
 the backend must recompute `total_amount` server-side from the cart
@@ -50,7 +53,7 @@ inserts it into the `orders` table with zero recomputation from `userCarts[userI
 | **Severity** | Medium — a stated post-condition of a core business flow (README FR-08 line 108) is violated on every successful checkout; the customer's cart silently retains items they already paid for, risking accidental duplicate purchase or confusion. Proven mechanism: the cart array is byte-identical before and after a successful checkout. Not classified higher — no data corruption or security boundary is crossed. |
 | **Priority** | Medium-High — visible on every checkout, not an edge case. |
 | **Ref** | `TC-08-EP-004` / `ER-08-EP-004` (`out/reports/FR-08-checkout/domain-testing/report.md`, `work/FR-08-checkout/execution-results.md`) |
-| **GitHub Issue** | Not filed — the repository has Issues disabled (confirmed via `gh issue create`, 2026-07-04). Approved draft + local evidence only. |
+| **GitHub Issue** | [#2](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/2) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-08 line 108, oracle): after a successful checkout, the cart
 must be cleared for that user.
@@ -79,7 +82,7 @@ the file clears or resets it after an order is created.
 | **Severity** | Critical — README FR-09 row C4 states a coupon requires a valid JWT, and row C5 states a per-user usage cap; evidence directly proves neither is enforced by any code path on this endpoint, and that the one client-supplied field (`user_id`) the code uses as an identity proxy can simply be omitted to bypass the usage cap too — for any unauthenticated caller, on any coupon. Not extended beyond what was proven: whether `apply-coupon`'s output is later trusted uncritically by an authenticated `checkout` call was not tested — the claim is scoped to `apply-coupon`'s own missing authentication and defeated usage cap. |
 | **Priority** | P1 |
 | **Ref** | `TC-08-EP-008` / `ER-08-EP-008` and `TC-08-DT-002` / `ER-08-DT-002` |
-| **GitHub Issue** | Not filed — repository has Issues disabled. Approved draft + local evidence only. |
+| **GitHub Issue** | [#3](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/3) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-09 rows C4 and C5, reframed outcome-level per Testing Model
 Assumption A7): a coupon must not be applied for a request that presents no valid JWT, and a
@@ -110,7 +113,7 @@ entirely.
 | **Severity** | Critical — the discount/final-amount calculation is a core computed value for every percent-type coupon (not a rare edge case — `SAVE10` is the system's flagship percent coupon), and evidence proves it returns a result inverted and inflated far beyond the original total. Not extended beyond what was proven: whether this incorrect `final_amount` is ever actually charged to a customer was not tested (no payment step exists in this SUT to observe). |
 | **Priority** | P1 |
 | **Ref** | `TC-08-EP-010` / `ER-08-EP-010` |
-| **GitHub Issue** | Not filed — repository has Issues disabled. Approved draft + local evidence only. |
+| **GitHub Issue** | [#4](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/4) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-09 "Công thức tính giảm giá," percent type):
 `discount_amount = total × discount_value / 100`. For `total_amount = 1,000,000`,
@@ -141,7 +144,7 @@ and is unaffected (confirmed passing in `TC-08-EP-011`).
 | **Severity** | Medium — a defined, named business rule (README FR-09 row C3, explicitly stated as inclusive) is violated at exactly one point: an order whose total exactly equals a coupon's minimum threshold is wrongly denied the discount it is entitled to. Proven narrowly: the value just below and just above both behave correctly under either reading; only the boundary point itself diverges. |
 | **Priority** | Medium |
 | **Ref** | `TC-08-BVA-001/002/003` / `ER-08-BVA-001/002/003` |
-| **GitHub Issue** | Not filed — repository has Issues disabled. Approved draft + local evidence only. |
+| **GitHub Issue** | [#5](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/5) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-09 row C3, "Tổng đơn hàng >= (lớn hơn hoặc bằng)
 min_order_amount"): a coupon is usable when `total_amount >= min_order_amount`, including
@@ -184,6 +187,7 @@ each reframed at the modeling stage into a direct, path-agnostic spec reading be
 case was written, so no bug report needed to lean on an assumption's credibility. Zero
 reclassifications between spec-grounded and assumption-grounded during this review.
 
-**GitHub filing:** none of the 5 bugs are filed as GitHub issues — the repository has Issues
-disabled (confirmed 2026-07-04, see `work/FR-08-checkout/bug-report-drafts.md`). All 5 are
-promoted here with local evidence only, per the plan's documented fallback.
+**GitHub filing:** all 5 bugs are now filed as GitHub issues (#1–#5), as of 2026-07-04, later
+the same day Issues were enabled on the repository — see `work/FR-08-checkout/bug-report-drafts.md`
+for the resolution note. Filed verbatim from the already-approved content; no technical field
+was changed.

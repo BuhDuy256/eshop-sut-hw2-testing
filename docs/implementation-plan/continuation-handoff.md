@@ -35,14 +35,14 @@ After FR-15: FR-17 (Coupon Management CRUD), then the global deliverables (`out/
 - `backend/database.sqlite` may show as modified in the working tree between sessions — this
   is expected residue from manual test runs (the DB is reseeded before each execution batch,
   per `docs/implementation-plan/execution-notes.md`); not a blocker.
-- **New blocker discovered this session, not yet in `blockers.md`** (that Step-0 artifact is
-  frozen — see §5): `gh` CLI is now installed and authenticated (`gh auth status` → logged in
-  as `BuhDuy256`), resolving Step 0's original "`gh` not installed" gap. However, **the GitHub
-  repository itself has Issues disabled** (`gh issue create` → "the
-  'BuhDuy256/eshop-sut-hw2-testing' repository has disabled issues"). This is a harder,
-  different blocker — bug filing still falls back to "approved draft + local evidence only"
-  for every bug so far (`BUG-08-001..005`), and will for FR-15/FR-17 too unless Issues are
-  enabled on the repo (Settings → General → Features) before then.
+- **Update, same day:** the GitHub-Issues-disabled blocker noted above is **now resolved**.
+  Issues have been enabled on the repository, and all 5 FR-08 bug reports (`BUG-08-001..005`),
+  originally promoted local-evidence-only, have been filed verbatim as GitHub issues #1–#5 (no
+  technical content changed — only each report's `GitHub Issue` field). This resolution is
+  recorded as an addendum in `docs/implementation-plan/blockers.md` (not a rewrite of its
+  Step-0 content) and in `work/FR-08-checkout/bug-report-drafts.md`. **For FR-15/FR-17: GitHub
+  issue filing should now work normally** — attempt it as part of each `approve → file` gate,
+  the same fallback-if-blocked discipline still applies if some new blocker appears.
 
 ## 3. Files a new session must read before doing anything, in priority order
 
@@ -57,11 +57,9 @@ After FR-15: FR-17 (Coupon Management CRUD), then the global deliverables (`out/
 5. `docs/implementation-plan/oracle-precedence.md` — the frozen rule for spec-doc conflicts
    and the evidence standard (screenshot vs. raw text vs. self-contained request/response
    capture — all three forms were actually used across FR-08's bug reports).
-6. `docs/implementation-plan/blockers.md` — **read together with §2 above**: this file itself
-   is frozen at its Step-0 content (`gh` not installed) and has *not* been retroactively
-   updated to reflect this session's finding (`gh` now works, but Issues are disabled) — that
-   finding lives in `work/FR-08-checkout/bug-report-drafts.md` and this handoff instead, per
-   the no-retroactive-edit policy (§5).
+6. `docs/implementation-plan/blockers.md` — frozen at its Step-0 content, plus a dated
+   addendum recording that `gh` now works and that Issues (initially disabled) are now enabled
+   on the repository — GitHub issue filing should work normally going forward.
 7. `docs/implementation-plan/execution-notes.md` — the working Model-C execution command form
    (login, authed request, reseed).
 8. `.claude/skills/domain-test-design/SKILL.md` and `.claude/skills/bug-reporting/SKILL.md` —
@@ -125,11 +123,12 @@ logic as a guide to copy by hand instead of invoking them.
   fixing it immediately.** Keep moving through FR-15 using the skills as they are. Only come
   back to fix the framework if the limitation actually blocks completing FR-15 — and even then,
   confirm with the user first.
-- **`blockers.md` stays frozen at its Step-0 content** — the new GitHub-Issues-disabled finding
-  from this session is recorded in `work/FR-08-checkout/bug-report-drafts.md` and this handoff,
-  not retrofitted into `blockers.md`. Follow the same pattern for FR-15: if bug filing hits the
-  same disabled-Issues wall, fall back to local-evidence-only (as all 5 FR-08 bugs did) and
-  note it in FR-15's own bug-report-drafts file, not by editing `blockers.md`.
+- **`blockers.md` stays frozen at its Step-0 content**, with one addendum (dated, appended, not
+  a rewrite) recording the GitHub-Issues-disabled-then-resolved episode. Follow the same
+  pattern for FR-15 if a new environment blocker appears: record it as a dated addendum or in
+  the feature's own bug-report-drafts file, never by rewriting existing frozen content.
+  GitHub issue filing itself should now work normally for FR-15/FR-17 (Issues enabled, `gh`
+  authenticated) — attempt it at the `approve → file` gate as a matter of course.
 - Framework governance still applies: MODEL ≠ ORACLE (expected results only from `README.md`
   or an accepted assumption, never from code or observed output), freeze-before-execute
   (commit the frozen test case before any execution), the three Human Gates
@@ -212,8 +211,9 @@ paused on, not self-approved):
   execution-order confound FR-08's `TC-08-BVA-003` hit, where one case's setup accidentally
   changes state a later case depends on).
 - `out/reports/FR-15-product-crud/bug-reports/report.md` — any confirmed defects, human-gated
-  per report (`approve → file`), attempted for GitHub filing (may hit the same disabled-Issues
-  wall FR-08 did — fall back to local-evidence-only the same way if so).
+  per report (`approve → file`), filed as GitHub issues (Issues are enabled and `gh` is
+  authenticated as of this handoff — this should now work normally; fall back to
+  local-evidence-only, documented, only if some new blocker appears).
 - New rows in `[AI-02]` (starting at Artifact #15) for every new AI-generated artifact.
 - Git commits following the same per-phase discipline as FR-08 Full: freeze before execute,
   one commit per artifact/phase, human gates honored (paused on, not silently auto-approved).
@@ -238,8 +238,8 @@ Read, in this exact order, before doing or proposing anything:
 4. docs/implementation-plan/continuation-handoff.md — the handoff written for you
    specifically. Follow it.
 5. docs/implementation-plan/oracle-precedence.md
-6. docs/implementation-plan/blockers.md (frozen at Step-0 content — read it together with
-   the handoff's §2/§5 for the GitHub-Issues-disabled finding it does NOT yet reflect)
+6. docs/implementation-plan/blockers.md (frozen at Step-0 content, plus a dated addendum:
+   gh now works and Issues are now enabled on the repository)
 7. docs/implementation-plan/execution-notes.md
 8. .claude/skills/domain-test-design/SKILL.md
 9. .claude/skills/bug-reporting/SKILL.md
@@ -272,10 +272,10 @@ Ground rules, non-negotiable:
 - Follow the project's existing discipline: MODEL != ORACLE, freeze test cases and commit
   before executing them, honor the three Human Gates (completeness_confirmed, FAIL -> real
   bug?, approve -> file) by actually asking me rather than self-approving, and log one AI
-  Audit entry per AI-generated artifact. GitHub issue filing may hit the same
-  "Issues disabled on this repo" wall FR-08 did (gh itself now works) — if so, fall back to
-  local-evidence-only the same way, and note it in FR-15's own bug-report-drafts file rather
-  than editing blockers.md.
+  Audit entry per AI-generated artifact. GitHub issue filing should now work normally (Issues
+  are enabled, gh is authenticated) — attempt it at the approve -> file gate; if some new
+  blocker appears, fall back to local-evidence-only and note it in FR-15's own
+  bug-report-drafts file rather than editing blockers.md's existing content.
 
 Start by reading the files above, then tell me what you found (current status, what FR-15
 needs) and propose the first concrete step. Do not start executing test cases before I

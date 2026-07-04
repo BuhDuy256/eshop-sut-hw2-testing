@@ -27,6 +27,10 @@
 
   **Approved 2026-07-04.**
 
+  **Update 2026-07-04 (later the same day):** the environment blocker is resolved — Issues
+  are now enabled on the repository and `gh` is authenticated. Filed verbatim from this
+  already-approved content, no technical field changed: [issue #1](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/1).
+
 ---
 
 # Continuation FR-08 Full — Bug Report Drafts (2026-07-04)
@@ -118,3 +122,15 @@
   to `out/reports/FR-08-checkout/bug-reports/report.md` with local evidence only. Enabling
   Issues on the repository (Settings → General → Features) would resolve this for future
   filing, if desired.
+
+  **Update 2026-07-04 (later the same day, Continuation task — resolving the environment
+  blocker, not re-opening Core Complete or this batch's technical content):** Issues have been
+  enabled on the repository. Re-verified `gh auth status` (still authenticated as `BuhDuy256`)
+  and `gh repo view --json hasIssuesEnabled` (`true`). Filed all 4 approved drafts verbatim —
+  `BUG-08-002` → [#2](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/2),
+  `BUG-08-003` → [#3](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/3),
+  `BUG-08-004` → [#4](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/4),
+  `BUG-08-005` → [#5](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/5) — no title,
+  severity, priority, expected, actual, repro, or evidence content changed from what was
+  already approved above; only the `GitHub Issue` field in
+  `out/reports/FR-08-checkout/bug-reports/report.md` was updated to reference each issue.
