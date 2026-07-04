@@ -1,7 +1,12 @@
 # FR-04 — Bug Report
 
-> GitHub Issue: not filed for any bug below — `gh` CLI unavailable in this environment (see
-> `docs/implementation-plan/blockers.md`, 0.2). Approved drafts + local evidence only.
+> **Update 2026-07-04 (Continuation environment-integration task):** all 4 bugs below were
+> originally approved and promoted with local evidence only — `gh` CLI was unavailable at the
+> time (see `docs/implementation-plan/blockers.md`, 0.2). That blocker has since resolved
+> (`gh` is now installed/authenticated, and GitHub Issues are enabled on the repository — see
+> the FR-08 report and `blockers.md`'s addendum). All 4 have now been filed verbatim as GitHub
+> issues #6–#9, with no change to any technical content — only the `GitHub Issue` field per
+> bug was added/updated.
 
 ## BUG-04-004 — Role injection via profile update (CRITICAL)
 
@@ -10,6 +15,7 @@
 | **Severity** | Critical |
 | **Priority** | P0 |
 | **Ref** | `TC-04-EP-005` (`out/reports/FR-04-personal-profile/domain-testing/report.md`) |
+| **GitHub Issue** | [#6](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/6) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` line 67 + SEC-06, line 283): a `role` field in the
 `PUT /api/users/me` request body must have no effect on the stored `role`.
@@ -37,6 +43,7 @@ unrestricted `role` update whenever the client includes a truthy `role` field.
 | **Severity** | High |
 | **Priority** | P2 |
 | **Ref** | `TC-04-EP-004`, `TC-04-BVA-006/009/010` |
+| **GitHub Issue** | [#7](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/7) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-04 line 65, applied path-agnostically — see
 `work/FR-04-personal-profile/assumptions.md` A4): a `phone` value violating "bắt đầu bằng số
@@ -65,6 +72,7 @@ destructures `phone` from `req.body` and writes it to the `UPDATE` query with no
 | **Severity** | High |
 | **Priority** | P2 |
 | **Ref** | `TC-04-BVA-001..005` |
+| **GitHub Issue** | [#8](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/8) — filed 2026-07-04 after Issues were enabled on the repository. |
 
 **Expected** (per `README.md` FR-04 line 65): values matching `^0[0-9]{9,10}$` (spec-valid)
 should be accepted by the form; values not matching it should be rejected.
@@ -98,6 +106,7 @@ window).
 | **Severity** | Medium |
 | **Priority** | P3 |
 | **Ref** | `TC-04-EP-002` |
+| **GitHub Issue** | [#9](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/9) — filed 2026-07-04 after Issues were enabled on the repository. |
 | **Classification note** | **This defect is reported against an accepted assumption
   (`work/FR-04-personal-profile/assumptions.md` A2), not a direct `README.md` FR-04
   citation.** `README.md` states `name` is mandatory **at registration** (FR-01 line 32); FR-04
