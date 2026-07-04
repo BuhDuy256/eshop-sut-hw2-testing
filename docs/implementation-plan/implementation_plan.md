@@ -253,13 +253,12 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 | 2 Oracle precedence | [x] |
 | 3 FR-08 smoke | [x] |
 | 4 FR-04 pilot | [x] |
-| 5 domain-test-design skill | [ ] |
+| 5 domain-test-design skill | [x] |
 | 6 bug-reporting skill | [ ] |
 
 ## > NEXT ACTION
 
-**Do Step 5** — extract the `domain-test-design` skill from FR-04: write methodology notes
-from what actually worked in 4.2–4.3, run `generate-skill` to produce
-`.claude/skills/domain-test-design/SKILL.md`, validate it reproduces FR-04's EP/BVA tables
-equivalently (without overwriting the deliverable), then run the coupling smell-test grep
-(zero hits required).
+**Do Step 6** — extract the `bug-reporting` skill from FR-04: write methodology notes from
+what actually worked in 4.4 (base: master-plan Part 5, Skill 5), run `generate-skill` to
+produce `.claude/skills/bug-reporting/SKILL.md`, validate against FR-04's bug reports
+(equivalent output), then run the coupling smell-test (0 hits).
