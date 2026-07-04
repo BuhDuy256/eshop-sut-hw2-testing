@@ -7,7 +7,7 @@
 | **ID** | `BUG-08-001` |
 | **Title** | Checkout persists client-forged `total_amount` instead of the server-recomputed cart total |
 | **Ref** | `TC-08-001` (test case) / `ER-08-001` (execution result) |
-| **Severity** | Critical — direct financial impact: any authenticated user can pay an arbitrary (near-zero) amount for any cart regardless of real value. |
+| **Severity** | Critical — `total_amount` is the SUT's sole financial record for an order: it is what the admin revenue dashboard aggregates for `status = 'delivered'` orders (`README.md` line 183) and the only recorded amount owed for the order. Evidence proves this field is 100% attacker-controlled with zero server-side validation, for any authenticated user, on any order — a complete failure of the one rule (`README.md` FR-08 line 107) that exists specifically to prevent it, with no compensating control elsewhere in the checkout flow. Note: this SUT has no separate payment-gateway charge step to observe: severity is assessed against the order's financial-record integrity (and its downstream use in revenue reporting), not against an independently verified real-money charge event. |
 | **Priority** | P1 |
 | **Expected** | Per `README.md` FR-08 line 107 (oracle, see `docs/implementation-plan/oracle-precedence.md`): the backend must recompute `total_amount` server-side from the cart (`X = Σ price × quantity`) and persist that value, ignoring whatever `total_amount` the client sends. For this case: `X = 30,000,000` VND (1× iPhone 15 Pro Max). |
 | **Actual** | The created order (`orderId: 1`) persists `total_amount = 1` — the exact forged value sent by the client — with no server-side recomputation. Confirmed via `GET /api/orders/my-orders` and `GET /api/orders/1`. |

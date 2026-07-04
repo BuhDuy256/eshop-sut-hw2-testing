@@ -38,7 +38,7 @@
 | A1 | User is authenticated (valid JWT) for the checkout call. | `{source: spec, confidence: HIGH, status: accepted}` |
 | A2 | Cart is non-empty at checkout time. | `{source: spec, confidence: HIGH, status: accepted}` |
 | A3 | Product price and quantity do not change during the test (no concurrent edits). | `{source: external, confidence: HIGH, status: accepted}` |
-| A4 | No coupon/voucher, shipping fee, or tax is applied in this smoke case — `X` is the raw cart sum only. If any such component exists and is spec-required, it must be included in `X`; FR-09 (coupons) is out of scope for this smoke case. | `{source: spec, confidence: HIGH, status: accepted}` |
+| A4 | No coupon/voucher, shipping fee, or tax is applied in this smoke case — `X` is the raw cart sum only. This is a scope-limiting decision by the tester, not a spec-asserted fact (the spec itself describes FR-09 coupons as an available feature); FR-09 is deliberately out of scope for this smoke case only. | `{source: external, confidence: HIGH, status: accepted}` |
 
 ## Forbidden / negative space
 

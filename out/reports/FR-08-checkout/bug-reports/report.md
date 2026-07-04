@@ -7,7 +7,7 @@
 
 | Field | Value |
 |---|---|
-| **Severity** | Critical — direct financial impact: any authenticated user can pay an arbitrary (near-zero) amount for any cart regardless of real value. |
+| **Severity** | Critical — `total_amount` is the SUT's sole financial record for an order: it is what the admin revenue dashboard aggregates for `status = 'delivered'` orders (`README.md` line 183) and the only recorded amount owed for the order. Evidence proves this field is 100% attacker-controlled with zero server-side validation, for any authenticated user, on any order — a complete failure of the one rule (`README.md` FR-08 line 107) that exists specifically to prevent it, with no compensating control elsewhere in the checkout flow. Note: this SUT has no separate payment-gateway charge step to observe: severity is assessed against the order's financial-record integrity (and its downstream use in revenue reporting), not against an independently verified real-money charge event. |
 | **Priority** | P1 |
 | **Ref** | `TC-08-001` (`out/reports/FR-08-checkout/domain-testing/report.md`) |
 | **GitHub Issue** | Not filed — `gh` CLI unavailable in this environment (see `docs/implementation-plan/blockers.md`, 0.2). Approved draft + local evidence only, per the plan's documented fallback. |
