@@ -2,12 +2,13 @@
 name: bug_reporting
 description: >
   Confirms which executed test failures are real defects, groups the ones that share a root
-  cause, classifies severity and priority using only what the evidence actually proved, and
-  writes an evidenced bug report for each — clearly separating an expected result the spec
-  states directly from one that only rests on an accepted assumption. Takes executed test
-  results (an actual outcome and a verdict, each referencing a frozen test case) and the
-  source code as input. Produces confirmed defect reports gated on human approval before
-  promotion, plus a summary of totals by outcome and by severity.
+  cause without merging unrelated ones, classifies severity and priority using only what the
+  evidence actually proved, and writes an evidenced bug report for each — clearly separating
+  an expected result the spec states directly from one that only rests on an accepted
+  assumption. Takes executed test results (an actual outcome and a verdict, each referencing
+  a frozen test case) and the source code as input. Produces confirmed defect reports gated
+  on human approval before promotion, plus a summary of totals by outcome, by severity, and
+  by how many rest on a direct citation versus an accepted assumption.
 ---
 
 # Bug Reporting
@@ -36,7 +37,7 @@ Only treat each input as authoritative for what it actually contains.
 |---|---|---|
 | Executed test results (actual + verdict, referencing a frozen test case) | What was observed when a specific frozen case ran | Whether the observed behavior is correct — that already lives in the test case's own expected result |
 | The frozen test case being referenced | The expected result and its source (spec citation or accepted assumption) | Anything not already decided when the case was frozen — a bug report may not invent a new expectation at write time |
-| The source code | Why a defect happens (root cause), once one is already confirmed | Whether something is a defect in the first place — that is decided from the expected-vs-actual comparison, never from reading code alone |
+| The source code | Why a defect happens (root cause), once one is already confirmed | Whether something is a defect in the first place, or how severe it is — those are decided from the expected-vs-actual comparison and executed evidence, never from reading code alone |
 
 ---
 
@@ -50,9 +51,9 @@ Only treat each input as authoritative for what it actually contains.
   - **Reasoning:**
     → Is this a genuine defect, or could it be a test/setup artifact — stale state left from
       an earlier run, wrong credentials, a variable that was not actually isolated?
-    → What concrete evidence supports either conclusion — was the environment freshly reset before
-      this run, did only the field under test change while everything else stayed at a
-      known-valid value, does the same result reproduce on a second attempt?
+    → What concrete evidence supports either conclusion — was the environment freshly reset
+      before this run, did only the field under test change while everything else stayed at
+      a known-valid value, does the same result reproduce on a second attempt?
   - **Output:** A confirm/reject decision, with its evidence, for this failure.
 
 - **Step 1.2 — Gate the next stage.** A failure with no recorded confirm/reject decision may
@@ -62,13 +63,18 @@ Only treat each input as authoritative for what it actually contains.
 
 ## Stage 2: Group failures by shared root cause
 
-**Objective:** Turn a list of confirmed failures into a smaller list of distinct defects.
+**Objective:** Turn a list of confirmed failures into a smaller list of distinct defects,
+without merging failures that only look alike.
 
 - **Step 2.1 — Decide which failures belong together:**
   - **Input:** All failures confirmed in Stage 1.
   - **Reasoning:**
     → Do two or more of these trace back to the same underlying defect — for example, the
       same missing check, exercised through different input values?
+    → If these failures were merged into one report, would that make reproduction less
+      clear, or would fixing the merged report actually require two or more independent
+      fixes? If either is true, they are not one defect — keep them as separate reports even
+      if they look related on the surface.
     → Ignore: grouping failures that only look similar on the surface but trace to different
       causes. That would hide a second, distinct defect inside one report.
   - **Output:** Groups of failures, one group per distinct defect.
@@ -92,6 +98,10 @@ Only treat each input as authoritative for what it actually contains.
       boundary crossed, a business rule violated, or a cosmetic mismatch?
     → Ignore: reusing a dramatic-sounding phrase just because it reads more urgently — match
       the words to the evidence, not to the desired impression.
+    → Ignore: raising the severity or the confidence of the claim because the source code
+      suggests the problem is worse than what was executed. Code may explain why the defect
+      happens; it may never push the severity or the confidence beyond what was actually run
+      and observed.
   - **Output:** A severity and priority, worded to match only what was proven.
 
 ---
@@ -133,9 +143,12 @@ claim.
   was read to explain why the defect happens, mark that explanation clearly as a root-cause
   note — the expected result still comes only from Stage 4, never from this note.
 
-- **Step 5.4 — Attach matching evidence.** Use whatever form actually matches how the case
-  was executed — a screenshot for a UI-driven case, a raw captured request/response for an
-  API-driven one — and state plainly which form was used and why, if it is not a screenshot.
+- **Step 5.4 — Attach matching evidence, and name its type.** Use whatever form actually
+  matches how the case was executed — a screenshot, a raw captured request/response, a log
+  excerpt, a direct database observation, or another form the execution actually produced —
+  and always state which type it is, in every report, not only when it happens to be
+  something other than a screenshot. This is what lets a reader trace the claim back to how
+  it was actually checked.
 
 ---
 
@@ -158,13 +171,20 @@ claim.
   failed, how many failures were confirmed as defects, and a count of confirmed defects by
   severity.
 
+- **Step 7.2 — Report the evidence basis.** How many confirmed defects ended up `spec`-
+  grounded versus `assumption`-grounded (Stage 4), and how many were reclassified from one to
+  the other during review. This shows how much of the run's confidence rests on a direct
+  citation versus an accepted judgment call.
+
 ---
 
 ## Output Format
 
 For each grouped defect: one bug report with the fixed fields from Stage 5 (ID, title,
-severity, priority, ref, expected + source, actual, steps to reproduce, evidence), plus its
-Stage 6 approval status.
+severity, priority, ref, expected + source, actual, steps to reproduce, evidence + its named
+type), plus its Stage 6 approval status.
 
-For the run as a whole: a summary with the totals from Stage 7 (executed / passed / failed /
-confirmed-defects counts, and a count of confirmed defects by severity).
+For the run as a whole: a summary with the totals from Step 7.1 (executed / passed / failed /
+confirmed-defects counts, and a count of confirmed defects by severity) and the evidence-basis
+breakdown from Step 7.2 (`spec`-grounded vs. `assumption`-grounded confirmed defects, and any
+reclassifications between the two).
