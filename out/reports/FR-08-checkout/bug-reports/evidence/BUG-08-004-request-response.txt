@@ -1,0 +1,26 @@
+BUG-08-004 — Percent-type discount formula produces a wildly incorrect (negative) discount
+Captured 2026-07-04, Continuation FR-08 Full, ref TC-08-EP-010 / ER-08-EP-010
+
+--- Request ---
+POST /api/apply-coupon HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer <test@eshop.com JWT>
+
+{"code":"SAVE10","total_amount":1000000,"user_id":2}
+
+(SAVE10: type=percent, discount_value=10 meaning "10%", min_order_amount=300000,
+ expired_at=2099-12-31, max_uses_per_user=1 — this is the coupon's first use for this user.)
+
+--- Response ---
+200 OK
+{"success":true,"coupon_id":1,"discount_amount":-9000000,"final_amount":10000000,"message":"Áp dụng thành công! Giảm 10%"}
+
+Per README.md FR-09 ("Công thức tính giảm giá"), the expected calculation for a percent-type
+coupon is:
+  discount_amount = total x discount_value / 100 = 1,000,000 x 10 / 100 = 100,000
+  final_amount    = total - discount_amount        = 1,000,000 - 100,000 = 900,000
+
+Actual returned discount_amount = -9,000,000 and final_amount = 10,000,000 — a "discount" that
+is negative and roughly 9x the order total, i.e. the customer would owe 10x more than the
+original total instead of paying 10% less.

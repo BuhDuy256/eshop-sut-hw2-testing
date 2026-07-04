@@ -1,0 +1,37 @@
+BUG-08-005 — Coupon order-threshold check rejects the exact boundary value (>= vs >)
+Captured 2026-07-04, Continuation FR-08 Full, ref TC-08-BVA-001/002/003, ER-08-BVA-001/002/003
+
+--- Request A: total_amount = 299,999 (min_order_amount - 1) ---
+POST /api/apply-coupon HTTP/1.1
+Authorization: Bearer <test@eshop.com JWT>
+{"code":"SAVE10","total_amount":299999,"user_id":2}
+--- Response A ---
+400 Bad Request
+{"error":"Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"}
+(Expected: rejected. Matches — both spec and code agree below the threshold.)
+
+--- Request B: total_amount = 300,000 (min_order_amount, exact boundary) ---
+POST /api/apply-coupon HTTP/1.1
+Authorization: Bearer <test@eshop.com JWT>
+{"code":"SAVE10","total_amount":300000,"user_id":2}
+--- Response B ---
+400 Bad Request
+{"error":"Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"}
+(Expected per README FR-09 row C3, ">= (lớn hơn hoặc bằng)": ACCEPTED. Actual: REJECTED.
+ This is the divergence — the code's check at server.js:379 is `total_amount > min_order_amount`,
+ strictly exclusive, contradicting the spec's stated inclusive ">=".)
+
+--- Request C: total_amount = 300,001 (min_order_amount + 1), re-run after DB reseed ---
+POST /api/apply-coupon HTTP/1.1
+Authorization: Bearer <test@eshop.com JWT>
+{"code":"SAVE10","total_amount":300001,"user_id":2}
+--- Response C ---
+200 OK
+{"success":true,"coupon_id":1,"discount_amount":-2700009,"final_amount":3000010,"message":"Áp dụng thành công! Giảm 10%"}
+(Expected: accepted. Matches on the threshold question — both spec and code agree above the
+ threshold. The discount_amount/final_amount values shown are wrong for the separate, already-
+ reported reason in BUG-08-004 — not part of this report's claim.)
+
+Isolated finding: exactly one value out of the three tested — 300,000, the documented boundary
+itself — diverges from the spec's stated inclusive reading. 299,999 and 300,001 both behave as
+expected under either reading.

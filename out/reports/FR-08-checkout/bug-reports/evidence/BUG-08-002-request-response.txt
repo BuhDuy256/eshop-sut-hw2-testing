@@ -1,0 +1,50 @@
+BUG-08-002 — Cart not cleared after successful checkout
+Captured 2026-07-04, Continuation FR-08 Full, ref TC-08-EP-004 / ER-08-EP-004
+
+--- Request 1: seed cart ---
+POST /api/cart HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer <test@eshop.com JWT>
+
+{"product_id":1,"name":"iPhone 15 Pro Max","price":30000000,"quantity":1}
+
+--- Response 1 ---
+200 OK
+{"message":"Added to cart"}
+
+--- Request 2: cart state before checkout ---
+GET /api/cart HTTP/1.1
+Host: localhost:3000
+Authorization: Bearer <test@eshop.com JWT>
+
+--- Response 2 ---
+200 OK
+[{"id":1,"name":"iPhone 15 Pro Max","price":30000000,"quantity":1},{"product_id":1,"name":"iPhone 15 Pro Max","price":30000000,"quantity":1}]
+
+--- Request 3: checkout ---
+POST /api/checkout HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer <test@eshop.com JWT>
+
+{"total_amount":30000000,"shipping_address":"123 Le Loi, TP.HCM"}
+
+--- Response 3 ---
+200 OK
+{"message":"Checkout successful","orderId":1}
+
+--- Request 4: cart state after checkout ---
+GET /api/cart HTTP/1.1
+Host: localhost:3000
+Authorization: Bearer <test@eshop.com JWT>
+
+--- Response 4 ---
+200 OK
+[{"id":1,"name":"iPhone 15 Pro Max","price":30000000,"quantity":1},{"product_id":1,"name":"iPhone 15 Pro Max","price":30000000,"quantity":1}]
+
+Observation: Response 4 is byte-identical to Response 2 — the cart was not touched by the
+successful checkout in Response 3. Note: the 2-entry cart in Response 2 includes 1 entry from
+in-memory `userCarts` residue predating this test run (userCarts is not reset by a DB reseed) —
+this does not affect the finding, since the array's non-empty state is unchanged across the
+checkout call regardless of its prior contents.
