@@ -43,6 +43,7 @@ docs/implementation-plan/
   oracle-precedence.md        # Step 2 rule
   learning-notes.md           # cross-cutting Learning Artifact log (architecture.md §3.1/§8), first entry from Step 3 self-review
   skill-4-domain-test-design-notes.md  # Step 5.1 methodology notes, input to generate-skill
+  skill-5-bug-reporting-notes.md       # Step 6.1 methodology notes, input to generate-skill
 
 work/                         # internal working artifacts (optional-to-submit, §14 "supporting")
   FR-08-checkout/             # created at Step 3 prep
