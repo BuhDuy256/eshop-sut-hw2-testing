@@ -246,9 +246,20 @@ out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md
 > the framework, not as a continued tuning exercise on the framework itself.
 
 After Step 6 the pipeline, contracts, and both skills are validated. Then, reusing the skills:
-1. FR-08 full (through skills; reuse the Step-3 smoke case). FR-08 stresses the decision-table path.
-2. FR-15, then FR-17 (through skills).
-3. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7).
+1. ~~FR-08 full (through skills; reuse the Step-3 smoke case). FR-08 stresses the decision-table path.~~
+   **Done, 2026-07-04.** Extended the model (auth-state, cart-clearing, FR-09 C1-C5, discount
+   formula) via `domain-test-design` Stage 1-2, human-approved; designed 10 EP + 7 BVA + a
+   7-row Decision Table (Stage 3-5), frozen and committed before execution; executed all 17
+   cases via Model C against the live SUT; confirmed 4 new defects via `bug-reporting`
+   (`BUG-08-002` cart not cleared, `BUG-08-003` `apply-coupon` has no auth enforcement at all,
+   `BUG-08-004` percent-formula returns a large negative discount, `BUG-08-005` C3 boundary
+   uses `>` instead of the spec's `>=`), approved and promoted alongside `BUG-08-001` (5 total
+   for FR-08). GitHub filing attempted (`gh` is now installed/authenticated, unlike Step 0) but
+   blocked — the repo has Issues disabled entirely; all 5 bugs are local-evidence-only in
+   `out/reports/FR-08-checkout/bug-reports/report.md`. See `work/FR-08-checkout/*` and the AI
+   Audit (`[AI-02]`, Artifacts #11-14) for full detail.
+2. FR-15, then FR-17 (through skills). **Not started.**
+3. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Not started.**
 
 ---
 
