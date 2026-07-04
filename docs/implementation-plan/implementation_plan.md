@@ -237,6 +237,14 @@ out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md
 
 ## Continuation (post-pilot — not part of the frozen 0–6 core)
 
+> **Baseline: `43defbc` — Steps 0–6 tagged Core Complete (2026-07-04).** From this commit
+> forward: do not retroactively edit Steps 0–6 artifacts (testing models, test cases,
+> execution results, bug reports, the two `SKILL.md` files, the audit rows already logged)
+> unless a genuine defect in them is found — not for further polish or generalization. Any
+> new improvement discovered during Continuation belongs to Continuation's own artifacts, not
+> backported into the baseline. Continuation work applies the two frozen skills as a user of
+> the framework, not as a continued tuning exercise on the framework itself.
+
 After Step 6 the pipeline, contracts, and both skills are validated. Then, reusing the skills:
 1. FR-08 full (through skills; reuse the Step-3 smoke case). FR-08 stresses the decision-table path.
 2. FR-15, then FR-17 (through skills).
@@ -268,12 +276,13 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 
 ## > NEXT ACTION
 
-Steps 0–6 (the frozen core) are complete. Both skills (`domain-test-design`, `bug-reporting`)
-are extracted and validated. **Move to Continuation work** (post-pilot, not part of the frozen
-0–6 sequence — see "Continuation" section above):
-1. FR-08 full (through the two skills; reuse the Step-3 smoke case) — stresses the
-   decision-table path (FR-09's 5 combined coupon conditions).
-2. FR-15, then FR-17 (through the skills).
-3. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged
-   corrections); finalize `[AI-02]`/`[AI-03]`/`[AI-05]`; `git log --oneline > out/git_commit_log.txt`;
-   one end-to-end skill demo video.
+**Steps 0–6 tagged Core Complete at `43defbc` (2026-07-04).** Confirmed by human review:
+baseline is consistent across plan/artifacts/git history, all exit criteria carry evidence,
+both skills are extracted/validated/smell-tested through two review rounds, and all three
+Human Gates + structural guards are demonstrated by real execution — not just asserted.
+
+**Paused here by explicit request** — Continuation has not started yet in this session. When
+resumed, the first Continuation task is: **FR-08 full**, driven through the two frozen skills
+(`domain-test-design`, `bug-reporting`) as a user of the framework, not as further tuning of
+it (stresses the decision-table path via FR-09's 5 combined coupon conditions). See the
+"Continuation" section above for the baseline-protection rule that applies from here on.
