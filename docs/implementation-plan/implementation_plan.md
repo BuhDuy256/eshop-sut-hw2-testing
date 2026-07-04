@@ -143,12 +143,16 @@ out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md
 - 3.6 Capture the executed request into `work/FR-08-checkout/requests.http` (post-hoc documentation).
 
 **Exit criteria (all must pass)**
-- [ ] Each artifact exists and links to the next by id.
-- [ ] `execution-results.md` contains no `expected` field.
-- [ ] `git log` shows the frozen Test Case commit **before** the Execution Result commit.
-- [ ] One screenshot saved under the deliverable evidence folder.
-- [ ] ≥1 AI Audit row appended.
-- [ ] A commit exists per artifact.
+- [x] Each artifact exists and links to the next by id.
+- [x] `execution-results.md` contains no `expected` field.
+- [x] `git log` shows the frozen Test Case commit **before** the Execution Result commit
+  (`024a656` before `3009936`).
+- [x] Evidence saved under the deliverable evidence folder — **caveat:** not a `.png`
+  screenshot as originally worded; a raw request/response `.txt` capture was substituted
+  because this case is API-only (curl, no browser), per `oracle-precedence.md` rule 5's
+  documented alternative for API-level evidence.
+- [x] ≥1 AI Audit row appended (3 rows, Artifacts #1–3).
+- [x] A commit exists per artifact (Step 3.1–3.6, verified via `git log`).
 
 **Assumption validated:** the pipeline composes; the six contracts link; the three structural guards hold in practice; evidence + audit + commit-granularity all work.
 **Risks impossible after this:** R1 (audit reconstruction), R2 (expected backfill — structurally blocked), R8/R9 (evidence medium), R11 (commit granularity), "contracts don't compose."
@@ -174,12 +178,17 @@ out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md
 
 **File paths:** the three `out/reports/FR-04-personal-profile/*` files; `work/FR-04-personal-profile/*`; `[AI-02]` audit file.
 **Exit criteria**
-- [ ] All three FR-04 report files populated.
-- [ ] Every expected cites `spec` or an `accepted` assumption (no `impl`/`actual` as source).
-- [ ] `git log` shows frozen cases committed before execution results.
-- [ ] Forbidden-field cases present (`role` injection, `email` immutability).
-- [ ] Audit rows exist for all AI-generated artifacts.
-- [ ] Per-phase commits present.
+- [x] All three FR-04 report files populated.
+- [x] Every expected cites `spec` or an `accepted` assumption (no `impl`/`actual` as source) —
+  including the A4 case, where the original layer-specific claim was rejected and reframed
+  rather than left as an unsupported assumption.
+- [x] `git log` shows frozen cases committed before execution results (`ef84047` before
+  `31d0df0`).
+- [x] Forbidden-field cases present (`role` injection — `TC-04-EP-005`; `email` immutability —
+  `TC-04-EP-006`).
+- [x] Audit rows exist for all AI-generated artifacts (Artifacts #4–7, plus #8–10 for the two
+  extracted skills).
+- [x] Per-phase commits present (4.1, 4.2, 4.3, 4.4×2, 4.5, 4.6 — verified via `git log`).
 
 **Assumption validated:** the method produces valid deliverables on the target feature; freeze-before-execute is enforceable and observable; the completeness gate catches negative space.
 **Risks impossible after this:** R5 (model-completeness gate unexercised), FR-04 design risk, "freeze-before-execute is only a slogan."

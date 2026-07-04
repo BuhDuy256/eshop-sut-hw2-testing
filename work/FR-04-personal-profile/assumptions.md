@@ -1,8 +1,9 @@
 # assumptions.md — FR-04 Personal Profile Management
 
 > Assumptions artifact (architecture.md §4.1). Only an **accepted** assumption may serve as an
-> oracle source for a Test Case (§4.3). All entries below are `status: proposed` pending
-> human review at the `completeness_confirmed` gate.
+> oracle source for a Test Case (§4.3). Entries below started as `status: proposed`; see
+> "Review status" immediately below for the final, human-reviewed disposition of each one
+> (A1–A3 accepted, A4 rejected and reframed).
 
 ## Review status (2026-07-04)
 
