@@ -43,6 +43,10 @@ summarize.
   transcript.
   - Ignore: grouping failures that merely look similar on the surface but trace to different
     causes (that would hide a second, distinct defect inside one report).
+  - **Judgment — guard against over-grouping:** if these failures were merged into one report,
+    would that make reproduction less clear, or would fixing the merged report actually
+    require two or more independent fixes? If either is true, they are not one defect — split
+    them back into separate reports even if they look related on the surface.
 
 ## Stage 3 — Classify severity and priority from only what was proven
 
@@ -58,6 +62,9 @@ summarize.
     boundary crossed, a business rule violated, or a cosmetic mismatch? Rank accordingly.
   - Ignore: reusing a dramatic-sounding severity phrase just because it reads more urgently;
     match the words to the evidence, not to the desired impression.
+  - Ignore: raising severity or confidence because the source code suggests the problem is
+    worse than what was executed. Code may explain the root cause; it may never raise the
+    severity or the confidence of the claim beyond what was actually run and observed.
 
 ## Stage 4 — Separate what the spec states from what only an assumption supports
 
@@ -84,8 +91,10 @@ reproduce, evidence.
   explanation clearly as a root-cause note derived from the code, not as the oracle — the
   expected result still comes only from Stage 4, never from this note.
 - Plain action: attach evidence in whatever form actually matches how the case was executed
-  (a screenshot for a UI-driven case, a raw captured request/response for an API-driven one);
-  state plainly which form was used and why, if it is not a screenshot.
+  (a screenshot for a UI-driven case, a raw captured request/response for an API-driven one, a
+  log excerpt, a direct database observation, and so on); always name the evidence type
+  explicitly in the report, not only when it is something other than a screenshot — this is
+  what lets a reader trace the claim back to how it was actually checked.
 
 ## Stage 6 — Human gate before promotion
 
@@ -99,6 +108,9 @@ reproduce, evidence.
 
 Plain action: report totals — how many cases were executed, how many passed, how many failed,
 how many failures were confirmed as defects, and a count of confirmed defects by severity.
+Also report how many confirmed defects ended up `spec`-grounded versus `assumption`-grounded
+(Stage 4), and how many were reclassified from one to the other during review — this shows
+how much of the run's confidence rests on direct citation versus an accepted judgment call.
 
 ## Authoritative inputs
 
