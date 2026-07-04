@@ -1,36 +1,48 @@
 # Continuation Handoff — for a new Claude Code session
 
-> Written 2026-07-04, at the end of the session that produced the Core Complete baseline.
-> No Continuation work was performed in that session. This file is the handoff artifact only.
+> Written 2026-07-04, at the end of the session that completed FR-08 Full (Continuation item
+> 1). This file supersedes the previous handoff (written after the Core Complete baseline,
+> before Continuation started) — that one is preserved in git history if needed, but this one
+> is the current, authoritative handoff.
 
 ---
 
 ## 1. Current project status
 
-**Steps 0–6 of the AI testing workflow are Core Complete.** The frozen pilot — Step 0
-(blockers), Step 1 (execution viability), Step 2 (oracle precedence), Step 3 (FR-08 smoke),
-Step 4 (FR-04 full pilot), Step 5 (`domain-test-design` skill extracted), Step 6
-(`bug-reporting` skill extracted) — is done, human-reviewed, and confirmed consistent across
-the plan document, the artifacts, and git history.
+**Steps 0–6 are Core Complete** (frozen at commit `43defbc`, see `implementation_plan.md`
+Status table). **Continuation item 1, FR-08 Full, is also now done** (this session, 2026-07-04):
+the FR-08/FR-09 Testing Model was extended (auth-state, cart-clearing, FR-09's 5 coupon
+conditions C1–C5, discount formula), EP + BVA + a 7-row Decision Table were designed and
+frozen, all 17 cases were executed against the live SUT, and 4 new confirmed bugs were found
+and approved (`BUG-08-002..005`, alongside the pre-existing `BUG-08-001` — 5 total for FR-08).
 
-**Continuation has not started.** The next work is FR-08 Full, described in §6 below.
+**The next Continuation item is FR-15 (Product Management CRUD)**, described in §6 below.
+After FR-15: FR-17 (Coupon Management CRUD), then the global deliverables (`out/README.md`,
+`ai-critique.md`, finalize `[AI-02]/[AI-03]/[AI-05]`, commit log, skill demo video) — see
+`implementation_plan.md`'s "Continuation" section, items 2–3.
 
 ## 2. Authoritative baseline
 
-- **Git commit `43defbc`** is the last commit that changed Steps 0–6 *artifact content*
-  (testing models, test cases, execution results, bug reports, the two `SKILL.md` files, AI
-  Audit rows).
-- **Git commit `b48b1b2`** (HEAD as of this handoff) added only a documentation/policy note to
-  `implementation_plan.md` recording the baseline and the no-retroactive-edit rule — it did
-  not change any Steps 0–6 artifact.
+- **Git commit `43defbc`** — last commit changing Steps 0–6 artifact content (frozen, see the
+  original handoff/git history for detail).
+- **Commits `982b659` through `0b6f58e`** (this session) — FR-08 Full: extended Testing Model
+  (`982b659`), frozen EP/BVA/Decision Table (`1feea56`), execution results (`47f0d86`), bug
+  report drafts (`46ab960`), promoted bug reports (`63e92cd`), Stage 7 summary (`0b6f58e`), and
+  the `implementation_plan.md` status update (`3d45427`, HEAD as of this handoff).
 - Treat **the repository itself — `implementation_plan.md` plus `git log`/`git show`** — as
-  the authoritative source of current status. Do not rely on any prior chat's memory or
-  summary; if this handoff and the repository ever disagree, the repository wins.
-- One pre-existing, harmless leftover: `backend/database.sqlite` shows as modified in the
-  working tree (residue from earlier manual test runs). Reseed it
-  (`docker exec eshop-backend node database.js`, per
-  `docs/implementation-plan/execution-notes.md`) before running new FR-08 executions; this is
-  not a blocker and not part of the baseline.
+  authoritative for current status, not this handoff or any prior chat's memory, if they ever
+  disagree.
+- `backend/database.sqlite` may show as modified in the working tree between sessions — this
+  is expected residue from manual test runs (the DB is reseeded before each execution batch,
+  per `docs/implementation-plan/execution-notes.md`); not a blocker.
+- **New blocker discovered this session, not yet in `blockers.md`** (that Step-0 artifact is
+  frozen — see §5): `gh` CLI is now installed and authenticated (`gh auth status` → logged in
+  as `BuhDuy256`), resolving Step 0's original "`gh` not installed" gap. However, **the GitHub
+  repository itself has Issues disabled** (`gh issue create` → "the
+  'BuhDuy256/eshop-sut-hw2-testing' repository has disabled issues"). This is a harder,
+  different blocker — bug filing still falls back to "approved draft + local evidence only"
+  for every bug so far (`BUG-08-001..005`), and will for FR-15/FR-17 too unless Issues are
+  enabled on the repo (Settings → General → Features) before then.
 
 ## 3. Files a new session must read before doing anything, in priority order
 
@@ -38,125 +50,175 @@ the plan document, the artifacts, and git history.
    deliverable file paths, how to run the SUT.
 2. `docs/architecture/architecture.md` — the frozen architecture (read for context; do **not**
    redesign it).
-3. `docs/implementation-plan/implementation_plan.md` — **read the Status table and the
-   "Continuation" section first**; this is where the baseline commit and the no-retroactive-
-   edit policy are recorded as project fact, not just as this handoff's claim.
-4. `docs/implementation-plan/oracle-precedence.md` — the frozen rule for spec-doc conflicts
-   and the evidence standard (screenshot vs. raw text).
-5. `docs/implementation-plan/blockers.md` — current state of the GitHub repo / `gh` CLI
-   (as of the baseline, `gh` was not installed; bug filing falls back to local approved draft
-   + evidence only).
-6. `docs/implementation-plan/execution-notes.md` — the working Model-C execution command form
+3. `docs/implementation-plan/implementation_plan.md` — read the Status table and the
+   "Continuation" section (item 2, FR-15, is next; item 1, FR-08 Full, is marked done with a
+   summary). Treat this file plus `git log`/`git show` as authoritative for current status.
+4. `docs/implementation-plan/continuation-handoff.md` — this file. Follow it.
+5. `docs/implementation-plan/oracle-precedence.md` — the frozen rule for spec-doc conflicts
+   and the evidence standard (screenshot vs. raw text vs. self-contained request/response
+   capture — all three forms were actually used across FR-08's bug reports).
+6. `docs/implementation-plan/blockers.md` — **read together with §2 above**: this file itself
+   is frozen at its Step-0 content (`gh` not installed) and has *not* been retroactively
+   updated to reflect this session's finding (`gh` now works, but Issues are disabled) — that
+   finding lives in `work/FR-08-checkout/bug-report-drafts.md` and this handoff instead, per
+   the no-retroactive-edit policy (§5).
+7. `docs/implementation-plan/execution-notes.md` — the working Model-C execution command form
    (login, authed request, reseed).
-7. `.claude/skills/domain-test-design/SKILL.md` and `.claude/skills/bug-reporting/SKILL.md` —
+8. `.claude/skills/domain-test-design/SKILL.md` and `.claude/skills/bug-reporting/SKILL.md` —
    the two frozen skills to use (see §4).
-8. Worked examples, for calibration only — **do not edit these**:
-   - `work/FR-08-checkout/*` and `out/reports/FR-08-checkout/*` (the Step-3 smoke case —
-     `TC-08-001`, `BUG-08-001` — is the seed to build FR-08 Full from, not to redo)
-   - `work/FR-04-personal-profile/*` and `out/reports/FR-04-personal-profile/*` (the Step-4
-     full-pilot example, showing what a complete model/EP/BVA/execution/bug-report pass looks
-     like end to end)
-9. `README.md` — the SUT specification, especially FR-08 (checkout, lines ~102–108) and FR-09
-   (the 5 combined coupon conditions, lines ~110–134). This is the behavioral oracle.
-10. `api_specification.md` §4.3/§5.1 — interface shape only for checkout/coupon endpoints, not
-    a behavioral oracle (see oracle-precedence.md for why).
-11. `backend/server.js` — read the checkout/coupon route handlers to locate what to test
-    (legitimate per architecture.md §2.1: code shows *where*, never *what's correct*).
-12. `out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md` — append
-    new rows here for every new AI-generated artifact; read the existing rows first for format.
+9. Worked examples, for calibration only — **do not edit these**:
+   - `work/FR-04-personal-profile/*` and `out/reports/FR-04-personal-profile/*` — the Step-4
+     full-pilot example: a feature with **no** combining conditions (Decision Table explicitly
+     skipped with a one-line reason). FR-15 looks the same shape (three independent field
+     rules, no conditions that must hold together) — this is the closer analogue for FR-15
+     than FR-08.
+   - `work/FR-08-checkout/*` and `out/reports/FR-08-checkout/*` — the Step-3 smoke *plus* this
+     session's full Continuation pass: shows the complete model-extend → EP/BVA/Decision-Table
+     → execute → bug-report cycle end to end, including a self-caught execution-order confound
+     (`TC-08-BVA-003`, documented rather than silently fixed) and a bug-grouping example
+     (`BUG-08-003` merges two failing cases under one root cause). Useful for the *bug-reporting*
+     half even though FR-15 likely won't need FR-08's Decision Table half.
+10. `README.md` FR-15 (lines 191–198) — the behavioral oracle. **Do not conflate with FR-16**
+    (CSV import, lines 200–211, immediately below it in the README) — FR-16 is a *different*
+    feature and is **not** one of this student's 4 assigned features (FR-04, FR-08, FR-15,
+    FR-17, per `CLAUDE.md`). Read FR-15 only.
+11. `api_specification.md` §3 (`GET /api/products`, `GET /api/products/:id`, `POST/PUT/DELETE
+    /api/products` — lines 78–98) — interface shape only for the product CRUD endpoints, not a
+    behavioral oracle (see `oracle-precedence.md` for why).
+12. `backend/server.js` — the product route handlers (`GET /api/products` line 141, `GET
+    /api/products/:id` line 159, `POST /api/products` line 167, `PUT /api/products/:id` line
+    179, `DELETE /api/products/:id` line 191) — read to locate where to test, per
+    architecture.md §2.1; never as the oracle.
+13. `out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md` — append new
+    rows here for every new AI-generated artifact; Artifacts #1–14 (plus one update) are
+    already logged — read a couple of the FR-08 ones (e.g. #11, #12) for the current format
+    before adding #15 onward.
 
 ## 4. The two skills to use
 
 - **`domain-test-design`** (`.claude/skills/domain-test-design/SKILL.md`) — builds the Testing
-  Model and designs EP/BVA/Decision Table test cases.
+  Model and designs EP/BVA/Decision Table test cases. Used unmodified across FR-08 Full this
+  session — no framework changes were needed.
 - **`bug-reporting`** (`.claude/skills/bug-reporting/SKILL.md`) — confirms failures, groups by
-  root cause, classifies severity/priority, writes evidenced bug reports.
+  root cause, classifies severity/priority, writes evidenced bug reports. Also used unmodified.
 
-Invoke them as skills (via the `Skill` tool), the same way they were validated in Step 5/6 —
-feed them the real FR-08 spec/code/model as input. Do not read their internal logic as a guide
-to copy by hand instead of invoking them; the whole point of Continuation is to use them as
-built.
+Invoke them as skills (via the `Skill` tool), feeding them the real FR-15 spec/code/model as
+input — the same way they were used for FR-08 Full this session. Do not read their internal
+logic as a guide to copy by hand instead of invoking them.
 
 ## 5. Immutable rules for this and all future Continuation sessions
 
-- **The core is frozen.** Steps 0–6 are Core Complete at commit `43defbc`.
-- **Do not edit Steps 0–6 artifacts** (`work/FR-08-checkout/*` and `work/FR-04-personal-profile/*`
-  content from the pilot, `out/reports/FR-08-checkout/domain-testing/report.md`'s `TC-08-001`,
-  `out/reports/FR-04-personal-profile/*`, the AI Audit rows already logged for Steps 0–6)
-  **unless a genuine defect in them is found** — never for further polish, restyling, or
+- **The core is frozen.** Steps 0–6 are Core Complete at commit `43defbc`. **FR-08 Full's
+  artifacts from this session are now also frozen** (the extended `testing-model.md`,
+  `TC-08-EP-002..011`/`TC-08-BVA-001..007`/`TC-08-DT-002`, `ER-08-*`, `BUG-08-002..005`) — do
+  not edit any of these unless a genuine defect in them is found, never for polish or
   generalization.
 - **Do not edit `domain-test-design/SKILL.md` or `bug-reporting/SKILL.md`** unless the skill
-  demonstrably fails or produces an indefensible result while actually being used on FR-08 —
-  a real framework bug, not a preference. If found, the fix still goes through the
+  demonstrably fails or produces an indefensible result while actually being used on FR-15 — a
+  real framework bug, not a preference. Both skills ran FR-08 Full without needing any change;
+  the bar for touching them stays high. If a fix is genuinely needed, it goes through the
   notes-first-then-regenerate flow (`docs/implementation-plan/skill-4-...-notes.md` /
   `skill-5-...-notes.md`), never a direct hand-patch.
-- **Every new improvement belongs to Continuation, not the baseline.** If FR-08 Full surfaces
-  a limitation in the framework or a skill, **record it** (as a Learning Artifact entry in
-  `docs/implementation-plan/learning-notes.md`, following the `LN-001` pattern already there)
-  **instead of fixing it immediately.** Keep moving through FR-08 Full using the skills as they
-  are. Only come back to fix the framework if the limitation actually blocks completing FR-08
-  Full — and even then, confirm with the user first.
-- Framework governance still applies: MODEL ≠ ORACLE (expected results come only from
-  `README.md` or an accepted assumption, never from code or observed output), freeze-before-
-  execute (commit the frozen test case before any execution), the three Human Gates
-  (`completeness_confirmed`, `FAIL → real bug?`, `approve → file`), and one AI Audit row per
-  AI-generated artifact, appended at creation time.
+- **Every new improvement belongs to Continuation, not the baseline.** If FR-15 surfaces a
+  limitation in the framework or a skill, **record it** (as a Learning Artifact entry in
+  `docs/implementation-plan/learning-notes.md`, following the `LN-001` pattern) **instead of
+  fixing it immediately.** Keep moving through FR-15 using the skills as they are. Only come
+  back to fix the framework if the limitation actually blocks completing FR-15 — and even then,
+  confirm with the user first.
+- **`blockers.md` stays frozen at its Step-0 content** — the new GitHub-Issues-disabled finding
+  from this session is recorded in `work/FR-08-checkout/bug-report-drafts.md` and this handoff,
+  not retrofitted into `blockers.md`. Follow the same pattern for FR-15: if bug filing hits the
+  same disabled-Issues wall, fall back to local-evidence-only (as all 5 FR-08 bugs did) and
+  note it in FR-15's own bug-report-drafts file, not by editing `blockers.md`.
+- Framework governance still applies: MODEL ≠ ORACLE (expected results only from `README.md`
+  or an accepted assumption, never from code or observed output), freeze-before-execute
+  (commit the frozen test case before any execution), the three Human Gates
+  (`completeness_confirmed`, `FAIL → real bug?`, `approve → file`) — actually ask the user for
+  each, don't self-approve — and one AI Audit row per AI-generated artifact, appended at
+  creation time. This session followed exactly this rhythm for FR-08 Full (extend model → stop
+  for `completeness_confirmed` → design + freeze + commit → execute → stop for `FAIL → real
+  bug?`/draft bugs → stop for `approve → file` → promote/attempt-filing → commit) — repeat the
+  same rhythm for FR-15, pausing at each of the three gates rather than proceeding through all
+  of them in one uninterrupted pass.
 
-## 6. First Continuation goal: FR-08 Full
+## 6. Next Continuation goal: FR-15 (Product Management CRUD)
 
-Per `implementation_plan.md`'s Continuation §1: **FR-08 Full**, through the two frozen skills,
-reusing the Step-3 smoke case (`TC-08-001` / `BUG-08-001`) as the seed rather than redoing it.
-FR-08 is deliberately the first Continuation target because it stresses the **Decision Table**
-path — the only path in this project's 4 assigned features with genuinely combining
-conditions (FR-09's 5 coupon conditions: code exists + active, not expired, order total meets
-threshold, user logged in, uses-per-user not exceeded) — which neither the FR-08 smoke nor the
-FR-04 pilot exercised.
+Per `implementation_plan.md`'s Continuation §2: **FR-15**, through the two frozen skills, as a
+fresh feature (no existing smoke case or partial model to extend — unlike FR-08, there is no
+`work/FR-15-product-crud/testing-model.md` yet; Phase 0/1 start from scratch here, closer to
+how FR-04 began).
 
 **Use the skills as a user of the framework, not as its designer.** If `domain-test-design` or
 `bug-reporting` produces something awkward, incomplete, or surprising while working through
-FR-08 Full, the default response is: note it as a Continuation-improvement candidate and keep
-going with the skill as it is — not stop and redesign the skill mid-task.
+FR-15, the default response is: note it as a Continuation-improvement candidate in
+`learning-notes.md` and keep going with the skill as it is — not stop and redesign the skill
+mid-task.
 
-### Inputs to read, in priority order (subset of §3, FR-08-specific)
+### What FR-15 actually specifies (README lines 191–198, oracle)
 
-1. `README.md` FR-08 (checkout) and FR-09 (coupons) — the oracle.
-2. `api_specification.md` §4.3 (checkout) and §5.1 (apply-coupon) — shape only.
-3. `backend/server.js` — checkout, coupon, and cart route handlers — to locate what to test.
-4. `work/FR-08-checkout/testing-model.md` — the existing (partial) model from the Step-3
-   smoke, to extend, not replace.
-5. `out/reports/FR-08-checkout/domain-testing/report.md` — the existing `TC-08-001`, to keep
-   and build around.
-6. `docs/implementation-plan/oracle-precedence.md` — reapply the same precedence rule to any
-   new README-vs-api_specification conflict found in the coupon logic.
+- Admin can Add / View / Edit / Delete products.
+- **Input constraints:** product name — required, max 255 characters. Price — required, must
+  be a **positive** number (`> 0`). Category — required, must be chosen from the existing list.
+- Editing one product must change **only** that product — other products must remain unchanged
+  (an isolation/side-effect constraint, likely its own test case rather than a boundary or
+  equivalence class).
 
-### Expected outputs of FR-08 Full
+At a glance this does **not** look like it has FR-08/09's combining-conditions shape (each of
+the three constraints — name, price, category — reads as independently enforced, similar to
+FR-04's `name`/`phone`/`shipping_address`) — but this is an observation, not a conclusion;
+apply Stage 5's own check (`domain-test-design`) rather than skipping the Decision Table step
+outright. If it turns out no conditions combine, skip it with a one-line reason, the same way
+FR-04 did.
 
-- `work/FR-08-checkout/testing-model.md` — extended to cover every FR-08/FR-09 variable: auth
-  state, cart state, `total_amount` (already modeled), coupon `code`, and the 5 coupon
-  conditions (C1–C5), each with domain/boundary/source/validation/oracle/metadata, run through
-  the `domain-test-design` skill's Stage 1–2 (including the assumption-defensibility check —
-  watch for any FR-09 rule that looks like it needs a layer-specific assumption; prefer the
-  least-committing, reframed oracle per Stage 2, the same lesson learned from FR-04's A4).
-- `out/reports/FR-08-checkout/domain-testing/report.md` — full EP test cases for all FR-08/
-  FR-09 variables (not just `total_amount`), with `TC-08-001` retained and referenced, not
-  duplicated.
-- `out/reports/FR-08-checkout/boundary-value-analysis/report.md` — currently an empty stub;
-  fill with BVA for `min_order_amount` (per-coupon thresholds), `max_uses_per_user`, and any
-  discount-rounding boundary FR-09 implies.
-- A **Decision Table** for the 5 combined coupon conditions — the first real one in this
-  project — built via `domain-test-design`'s Stage 5, with cases for combinations that
-  actually route to different outcomes (not an exhaustive 2⁵ truth table unless the skill's
-  own gate-legitimacy check says otherwise).
-- `work/FR-08-checkout/execution-results.md` — extended with new `ER-08-*` entries for the new
-  cases, executed via Model C (native Bash), no `expected` field.
-- `out/reports/FR-08-checkout/bug-reports/report.md` — extended with any new confirmed defects
-  from `bug-reporting`'s Stage 1–7 (grouped by root cause, severity from proven evidence only,
-  spec-vs-assumption labeled, human-gated per report), `BUG-08-001` retained.
-- New rows in `[AI-02]` for every new AI-generated artifact.
-- Git commits following the same discipline as Steps 3–4: freeze before execute, one commit
-  per artifact/phase, human gates honored (not silently auto-approved).
+### Inputs to read, in priority order (subset of §3, FR-15-specific)
+
+1. `README.md` FR-15 (lines 191–198) — the oracle. Do not read FR-16 as part of this feature.
+2. `api_specification.md` §3 (lines 78–98) — shape only for `GET /products`, `GET
+   /products/:id`, `POST/PUT/DELETE /products`.
+3. `backend/server.js` — the 5 product route handlers (lines 141, 159, 167, 179, 191) — to
+   locate what to test and to check for any code-revealed second boundary (e.g., does the code
+   actually enforce "name max 255 chars" or "price > 0," or does it accept anything and let the
+   DB/frontend silently truncate or reject? Does `category_id` get validated against the real
+   category list, or just stored as whatever integer is sent?).
+4. `backend/database.js` — the `products`/`categories` table schema and seed data, for
+   boundary values (name length limits at the schema level, the actual seeded category id
+   range) and to check whether `price` has any DB-level constraint (e.g. `CHECK` or just
+   `REAL`/`INTEGER` with no positivity enforcement).
+5. `work/FR-04-personal-profile/testing-model.md` and `out/reports/FR-04-personal-profile/*` —
+   calibration for a feature shaped like FR-15 (independent field-level rules, no Decision
+   Table) — not FR-08's.
+
+### Expected outputs of FR-15
+
+Following the same three-phase rhythm as FR-08 Full (with the three Human Gates actually
+paused on, not self-approved):
+
+- `work/FR-15-product-crud/testing-model.md` (new — first Phase-0/1 pass for this feature,
+  no partial model exists yet) — file map (which routes/files FR-15 touches), then one model
+  entry per variable (`name`, `price`, `category_id`) with domain/boundary+source/validation/
+  oracle/metadata, plus the edit-isolation constraint recorded as its own forbidden/postcondition
+  note (Step 1.3-shaped, even though it isn't exactly "forbidden state" — it's "other products
+  must not change," the same kind of explicit-not-buried-in-the-model note FR-08's
+  cart-clearing variable used). Human gate: `completeness_confirmed`, actually asked.
+- `out/reports/FR-15-product-crud/domain-testing/report.md` — EP cases for all 3 variables +
+  the edit-isolation case; a Decision Table only if Stage 5 actually finds combining conditions
+  (with a one-line skip-reason otherwise, per the FR-04 precedent).
+- `out/reports/FR-15-product-crud/boundary-value-analysis/report.md` — BVA for `name`'s 255-char
+  boundary and `price`'s `> 0` boundary (both are exactly the numeric/lexical boundary shapes
+  `domain-test-design`'s Stage 4 already knows how to handle — no new boundary *kind* expected
+  here, unlike FR-08/09's date and enum boundaries).
+- `work/FR-15-product-crud/execution-results.md` — executed via Model C, no `expected` field,
+  same discipline as FR-08 (reseed between runs if state matters; watch for the same kind of
+  execution-order confound FR-08's `TC-08-BVA-003` hit, where one case's setup accidentally
+  changes state a later case depends on).
+- `out/reports/FR-15-product-crud/bug-reports/report.md` — any confirmed defects, human-gated
+  per report (`approve → file`), attempted for GitHub filing (may hit the same disabled-Issues
+  wall FR-08 did — fall back to local-evidence-only the same way if so).
+- New rows in `[AI-02]` (starting at Artifact #15) for every new AI-generated artifact.
+- Git commits following the same per-phase discipline as FR-08 Full: freeze before execute,
+  one commit per artifact/phase, human gates honored (paused on, not silently auto-approved).
 - Any framework limitation surfaced along the way, logged in `learning-notes.md` rather than
-  fixed in place (per §5).
+  fixed in place (per §5) — FR-08 Full surfaced none; FR-15 may or may not.
 
 ---
 
@@ -170,50 +232,52 @@ any memory system; treat the repository as the only source of truth.
 Read, in this exact order, before doing or proposing anything:
 1. CLAUDE.md
 2. docs/architecture/architecture.md
-3. docs/implementation-plan/implementation_plan.md — pay special attention to the "Status"
-   table and the "Continuation" section, which record a baseline git commit and a
-   no-retroactive-edit policy for Steps 0-6. Treat this file plus `git log`/`git show` as
-   authoritative for current project state.
-4. docs/implementation-plan/continuation-handoff.md — the handoff written for you specifically.
-   Follow it.
+3. docs/implementation-plan/implementation_plan.md — the "Status" table and the
+   "Continuation" section (item 1, FR-08 Full, is done; item 2, FR-15, is next). Treat this
+   file plus `git log`/`git show` as authoritative for current project state.
+4. docs/implementation-plan/continuation-handoff.md — the handoff written for you
+   specifically. Follow it.
 5. docs/implementation-plan/oracle-precedence.md
-6. docs/implementation-plan/blockers.md
+6. docs/implementation-plan/blockers.md (frozen at Step-0 content — read it together with
+   the handoff's §2/§5 for the GitHub-Issues-disabled finding it does NOT yet reflect)
 7. docs/implementation-plan/execution-notes.md
 8. .claude/skills/domain-test-design/SKILL.md
 9. .claude/skills/bug-reporting/SKILL.md
-10. work/FR-08-checkout/* and out/reports/FR-08-checkout/* (existing Step-3 smoke case —
-    build on it, do not redo it)
-11. work/FR-04-personal-profile/* and out/reports/FR-04-personal-profile/* (worked example of
-    a full pass — for calibration only, do not edit)
-12. README.md, focusing on FR-08 (checkout) and FR-09 (coupons)
-13. api_specification.md, sections for checkout and apply-coupon
-14. backend/server.js, the checkout/coupon/cart route handlers
+10. work/FR-04-personal-profile/* and out/reports/FR-04-personal-profile/* (calibration: a
+    feature with no combining conditions, closer to FR-15's shape)
+11. work/FR-08-checkout/* and out/reports/FR-08-checkout/* (calibration: the full
+    model-extend -> EP/BVA/Decision-Table -> execute -> bug-report cycle, done this session)
+12. README.md FR-15 only (lines 191-198) — do not conflate with the adjacent FR-16 (CSV
+    import), which is not one of this student's 4 assigned features
+13. api_specification.md section 3 (product endpoints)
+14. backend/server.js, the 5 product route handlers, and backend/database.js's
+    products/categories schema
 15. out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md (existing
-    rows, for format)
+    rows, for format — Artifacts #1-14 already logged)
 
 Ground rules, non-negotiable:
-- Steps 0-6 of this project's testing workflow are already Core Complete, frozen at a git
-  commit recorded in implementation_plan.md. Do not edit any Steps 0-6 artifact (testing
-  models, test cases, execution results, bug reports, the two SKILL.md files, existing AI
-  Audit rows) unless you find an actual defect in them — never for polish or generalization.
+- Steps 0-6 are Core Complete (frozen at 43defbc); FR-08 Full's artifacts from the prior
+  session are also now frozen. Do not edit any of these unless you find an actual defect in
+  them — never for polish or generalization.
 - Do not redesign, rewrite, or "improve" the architecture, the workflow, or either skill. You
-  are a user of this framework now, not its designer. If a skill produces something awkward
-  or incomplete while you use it on real work, write it down as a Continuation-improvement
-  candidate (following the existing learning-notes.md pattern) and keep going with the skill
-  as it is, rather than stopping to fix it.
-- Your task is to start FR-08 Full: apply the domain-test-design skill and the bug-reporting
-  skill (invoke them as skills, using their actual logic, not by copying their steps by hand)
-  to build out a complete Testing Model, EP test cases, a Boundary Value Analysis, and — this
-  is the point of choosing FR-08 first — a real Decision Table for FR-09's 5 combined coupon
-  conditions, then execute and report bugs, exactly as described in
-  docs/implementation-plan/continuation-handoff.md section 6.
-- Follow the project's existing discipline: MODEL != ORACLE (expected results only from
-  README.md or an accepted assumption, never from code or observed output), freeze test cases
-  and commit before executing them, honor the three Human Gates (completeness_confirmed,
-  FAIL -> real bug?, approve -> file) by actually asking me rather than self-approving, and
-  log one AI Audit entry per AI-generated artifact.
+  are a user of this framework now, not its designer. Both skills ran FR-08 Full without any
+  change needed; if a skill produces something awkward on FR-15, write it down in
+  learning-notes.md and keep going with the skill as it is.
+- Your task is to build a complete Testing Model, EP test cases, and a Boundary Value Analysis
+  for FR-15 (Product Management CRUD) — starting from scratch, unlike FR-08 which had a
+  partial model to extend. Check whether FR-15's three field-level rules (name, price,
+  category) actually combine into anything needing a Decision Table (apply the skill's own
+  Stage 5 check rather than assuming either way), then execute and report bugs, exactly as
+  described in docs/implementation-plan/continuation-handoff.md section 6.
+- Follow the project's existing discipline: MODEL != ORACLE, freeze test cases and commit
+  before executing them, honor the three Human Gates (completeness_confirmed, FAIL -> real
+  bug?, approve -> file) by actually asking me rather than self-approving, and log one AI
+  Audit entry per AI-generated artifact. GitHub issue filing may hit the same
+  "Issues disabled on this repo" wall FR-08 did (gh itself now works) — if so, fall back to
+  local-evidence-only the same way, and note it in FR-15's own bug-report-drafts file rather
+  than editing blockers.md.
 
-Start by reading the files above, then tell me what you found (current status, what FR-08
-Full needs) and propose the first concrete step. Do not start executing test cases before I
+Start by reading the files above, then tell me what you found (current status, what FR-15
+needs) and propose the first concrete step. Do not start executing test cases before I
 confirm the plan.
 ```
