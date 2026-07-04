@@ -1,0 +1,18 @@
+Evidence for BUG-04-003 / TC-04-BVA-001..005 — FR-04 frontend phone regex contradicts spec
+Captured: 2026-07-04, via `node -e` evaluating the literal regex from
+frontend-web/src/pages/Profile.jsx line 43: /^[1-9][0-9]{8,9}$/
+
+Command form: node -e "console.log(/^[1-9][0-9]{8,9}$/.test('<value>'))"
+
+  091234567     (9 digits,  spec class: invalid, too short)          -> regex.test = false
+  0912345678    (10 digits, spec class: VALID)                        -> regex.test = false  <- MISMATCH
+  09123456789   (11 digits, spec class: VALID)                        -> regex.test = false  <- MISMATCH
+  091234567890  (12 digits, spec class: invalid, too long)            -> regex.test = false
+  1912345678    (10 digits, leading '1', spec class: invalid)         -> regex.test = true   <- MISMATCH
+
+Observation: the frontend regex requires the phone to start with a digit 1-9 and be 9-10
+digits long — the exact opposite of README FR-04 line 65 ("bắt đầu bằng số 0, từ 10-11 chữ
+số"). Every spec-valid phone number is rejected by the form; some spec-invalid numbers are
+accepted by the form. The two cases that happen to "pass" (091234567, 091234567890) do so for
+unrelated reasons (both fail the regex's own length window), not because the regex implements
+the spec's rule.

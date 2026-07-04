@@ -1,0 +1,18 @@
+Evidence for BUG-04-001 / TC-04-EP-002 — FR-04 empty name accepted
+Captured: 2026-07-04, via curl (Model C).
+
+POST http://localhost:3000/api/login
+Body: {"email":"test@eshop.com","password":"Test1234!"}
+Response 200: {"token":"<JWT>", ...}
+
+PUT http://localhost:3000/api/users/me
+Headers: Authorization: Bearer <token>
+Body: {"name":"","phone":"0912345678","shipping_address":"123 Le Loi"}
+Response 200: {"message":"Profile updated"}
+
+GET http://localhost:3000/api/users/me
+Headers: Authorization: Bearer <token>
+Response 200:
+{"id":2,"name":"","email":"test@eshop.com","password":"Test1234!","role":"user","login_attempts":0,"locked_until":null,"reset_token":null,"shipping_address":"123 Le Loi","phone":"0912345678"}
+
+Observation: name persisted as empty string. No server-side check rejects a blank name.

@@ -1,0 +1,22 @@
+Evidence for BUG-04-002 / TC-04-EP-004, TC-04-BVA-006/009/010 — FR-04 backend has zero
+phone-format validation
+Captured: 2026-07-04, via curl (Model C). DB reseeded before this run.
+
+PUT http://localhost:3000/api/users/me (repeated per value, fresh login each time)
+Headers: Authorization: Bearer <token>
+Body template: {"name":"Nguyen Van A","phone":"<value>","shipping_address":"123 Le Loi"}
+Response 200 each time: {"message":"Profile updated"}
+
+GET http://localhost:3000/api/users/me — persisted `phone` per input value:
+
+  input=091234567     (9 digits, spec-invalid: too short)      -> persisted phone=091234567
+  input=0912345678    (10 digits, spec-valid)                  -> persisted phone=0912345678
+  input=09123456789   (11 digits, spec-valid)                  -> persisted phone=09123456789
+  input=091234567890  (12 digits, spec-invalid: too long)      -> persisted phone=091234567890
+  input=1912345678    (10 digits, spec-invalid: leading digit) -> persisted phone=1912345678
+
+Also, from the EP run (separate reseed):
+  input=1912345678 (spec-invalid) -> GET returned phone:"1912345678" (persisted unchanged)
+
+Observation: every value, valid or invalid per README FR-04 line 65, is persisted verbatim.
+The backend performs no format check on `phone` at all.
