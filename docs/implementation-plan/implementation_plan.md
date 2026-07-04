@@ -255,11 +255,16 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 | 3 FR-08 smoke | [x] |
 | 4 FR-04 pilot | [x] |
 | 5 domain-test-design skill | [x] |
-| 6 bug-reporting skill | [ ] |
+| 6 bug-reporting skill | [x] |
 
 ## > NEXT ACTION
 
-**Do Step 6** — extract the `bug-reporting` skill from FR-04: write methodology notes from
-what actually worked in 4.4 (base: master-plan Part 5, Skill 5), run `generate-skill` to
-produce `.claude/skills/bug-reporting/SKILL.md`, validate against FR-04's bug reports
-(equivalent output), then run the coupling smell-test (0 hits).
+Steps 0–6 (the frozen core) are complete. Both skills (`domain-test-design`, `bug-reporting`)
+are extracted and validated. **Move to Continuation work** (post-pilot, not part of the frozen
+0–6 sequence — see "Continuation" section above):
+1. FR-08 full (through the two skills; reuse the Step-3 smoke case) — stresses the
+   decision-table path (FR-09's 5 combined coupon conditions).
+2. FR-15, then FR-17 (through the skills).
+3. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged
+   corrections); finalize `[AI-02]`/`[AI-03]`/`[AI-05]`; `git log --oneline > out/git_commit_log.txt`;
+   one end-to-end skill demo video.
