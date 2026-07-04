@@ -101,10 +101,20 @@
 
 ## Human gate: `approve → file` (Continuation batch)
 
-- [ ] Approve `BUG-08-002` (cart not cleared) for promotion + GitHub issue.
-- [ ] Approve `BUG-08-003` (apply-coupon auth/usage-cap bypass) for promotion + GitHub issue.
-- [ ] Approve `BUG-08-004` (percent formula) for promotion + GitHub issue.
-- [ ] Approve `BUG-08-005` (C3 boundary `>` vs `>=`) for promotion + GitHub issue.
+- [x] Approve `BUG-08-002` (cart not cleared) for promotion + GitHub issue.
+- [x] Approve `BUG-08-003` (apply-coupon auth/usage-cap bypass) for promotion + GitHub issue.
+- [x] Approve `BUG-08-004` (percent formula) for promotion + GitHub issue.
+- [x] Approve `BUG-08-005` (C3 boundary `>` vs `>=`) for promotion + GitHub issue.
 
-  **Pending human approval — each may be held back individually; none are promoted or filed
-  until checked.**
+  **Approved 2026-07-04 — all 4, requested to file as real GitHub issues (`gh` now installed
+  and authenticated as `BuhDuy256`, unlike at Step 0).**
+
+  **GitHub filing attempt:** `gh issue create --repo BuhDuy256/eshop-sut-hw2-testing ...` for
+  `BUG-08-002` returned: *"the 'BuhDuy256/eshop-sut-hw2-testing' repository has disabled
+  issues."* This is a harder, different blocker than Step 0's "`gh` not installed" (which has
+  since resolved) — the repo itself does not accept issues at all, regardless of `gh`'s state.
+  Not retried for the other 3 drafts (same repo, same blocker). Per the plan's fallback
+  ("GitHub posting blocked → proceed with local approved draft; do not block"), all 4 promoted
+  to `out/reports/FR-08-checkout/bug-reports/report.md` with local evidence only. Enabling
+  Issues on the repository (Settings → General → Features) would resolve this for future
+  filing, if desired.
