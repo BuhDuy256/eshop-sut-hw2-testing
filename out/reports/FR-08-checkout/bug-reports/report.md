@@ -161,3 +161,29 @@ inclusive `>=`.
 
 **Evidence:** [`evidence/BUG-08-005-request-response.txt`](evidence/BUG-08-005-request-response.txt)
 (raw request/response capture — API-level bug, no browser involved).
+
+---
+
+## Summary
+
+**Step-3 smoke:** 1 case executed, 1 confirmed defect (`BUG-08-001`).
+
+**Continuation FR-08 Full:** 17 cases executed (10 EP, 6 BVA counted at their final clean
+result + 1 confounded-then-reseeded re-run, 1 Decision Table case) — 13 passed, 5 failed,
+grouped into 4 confirmed defects (`BUG-08-002` groups 2 failing cases under one root cause;
+`BUG-08-004`/`BUG-08-005` are each 1 failing case). No failure was rejected as a test/setup
+artifact.
+
+**By severity (Continuation batch):** Critical — 2 (`BUG-08-003`, `BUG-08-004`). Medium — 2
+(`BUG-08-002`, `BUG-08-005`).
+
+**Evidence basis:** all 5 confirmed defects (`BUG-08-001..005`) are `spec`-grounded —
+every expected result traces directly to a README FR-08/FR-09 citation. None rest on an
+unresolved assumption; the two candidate assumptions that touched this batch (A6, A7) were
+each reframed at the modeling stage into a direct, path-agnostic spec reading before any test
+case was written, so no bug report needed to lean on an assumption's credibility. Zero
+reclassifications between spec-grounded and assumption-grounded during this review.
+
+**GitHub filing:** none of the 5 bugs are filed as GitHub issues — the repository has Issues
+disabled (confirmed 2026-07-04, see `work/FR-08-checkout/bug-report-drafts.md`). All 5 are
+promoted here with local evidence only, per the plan's documented fallback.
