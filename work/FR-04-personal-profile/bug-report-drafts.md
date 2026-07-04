@@ -45,7 +45,7 @@
 | **Priority** | P2 |
 | **`expected_source`** | `spec` — `README.md` FR-04 line 65. |
 | **Expected** | Values matching `^0[0-9]{9,10}$` (spec-valid) should be accepted by the form; values not matching it should be rejected. |
-| **Actual** | Frontend regex `^[1-9][0-9]{8,9}$` (`Profile.jsx` line 43) rejects `0912345678` and `09123456789` (both spec-valid) and accepts `1912345678` (spec-invalid). |
+| **Actual** | Executed (not read-only): running the literal frontend regex — `node -e "console.log(/^[1-9][0-9]{8,9}$/.test('<value>'))"`, the exact code from `Profile.jsx` line 43 — against each boundary value returned `false` for `0912345678` and `09123456789` (both spec-valid — regex rejects them) and `true` for `1912345678` (spec-invalid — regex accepts it). See `ER-04-BVA-002/003/005` for the full executed set. |
 | **Repro steps** | 1. Open the Profile page in the browser. 2. Enter `0912345678` in the phone field and submit. 3. Observe the client-side alert "Số điện thoại không hợp lệ..." blocking a valid number. (Also reproducible headlessly: `node -e "console.log(/^[1-9][0-9]{8,9}$/.test('0912345678'))"` → `false`.) |
 | **Root cause (code-derived, not the oracle)** | `frontend-web/src/pages/Profile.jsx` line 43 uses a regex pattern unrelated to the spec's rule (wrong leading-digit class, wrong length window). |
 | **Evidence** | `out/reports/FR-04-personal-profile/bug-reports/evidence/BUG-04-003-request-response.txt` |

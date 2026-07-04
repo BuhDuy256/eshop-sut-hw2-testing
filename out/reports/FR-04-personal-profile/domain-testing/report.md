@@ -99,20 +99,24 @@ spec, frontend regex, and backend behavior).
 
 ## AI Gap Analysis
 
-Cases/classes the AI did not design, and why:
+Cases/classes the AI did not design, and why. **None of the three items below were executed
+against the SUT in this pilot — they are untested hypotheses / future-work candidates, not
+confirmed defects.** No Test Case, Execution Result, or Bug Report exists for any of them.
 
-1. **Partial update / omitted fields.** All 16 frozen cases always send `name`, `phone`, and
-   `shipping_address` together, varying only the field under test. Reading
-   `backend/server.js` `PUT /api/users/me` again while writing this analysis shows it
-   destructures all three from `req.body` unconditionally — a request that omits, say,
-   `phone` entirely would pass `undefined` into the `UPDATE` query, likely **nulling out an
-   existing value that the client never intended to touch**. This is a plausible, testable
-   defect class (an invalid/missing-field equivalence partition) that was never designed as a
-   case. **Why missed:** the plan's own worked example for Step 4.2/4.3 always showed all
-   three fields together (mirroring the frontend form, which always submits all three), which
-   anchored the test design to "always-complete body" and never prompted an EP class for
-   "request omits an updatable field." This is a prompt/scope-anchoring gap, not a tool
-   limitation — worth adding as a case if FR-04 testing continues past this pilot.
+1. **Partial update / omitted fields (untested hypothesis).** All 16 frozen cases always send
+   `name`, `phone`, and `shipping_address` together, varying only the field under test.
+   Reading `backend/server.js` `PUT /api/users/me` again while writing this analysis shows it
+   destructures all three from `req.body` unconditionally — *if* a request omitted, say,
+   `phone` entirely, `undefined` would be passed into the `UPDATE` query, which *could*
+   null out an existing value the client never intended to touch. This is a code-reading
+   observation only (per architecture.md §2.1, legitimate for locating a potential test
+   target — not executed, not an oracle, not a confirmed defect). It names a plausible EP
+   class (an invalid/missing-field partition) that was never designed as a case. **Why
+   missed:** the plan's own worked example for Step 4.2/4.3 always showed all three fields
+   together (mirroring the frontend form, which always submits all three), which anchored the
+   test design to "always-complete body" and never prompted an EP class for "request omits an
+   updatable field." This is a prompt/scope-anchoring gap, not a tool limitation — worth
+   turning into an actual frozen case and executing if FR-04 testing continues past this pilot.
 2. **Wrong data type (not just wrong value).** All boundary/EP values for `phone`/`name` were
    strings. No case sends a non-string type (e.g. `phone: 912345678` as a JSON number, or
    `name: null`/`name: ["a"]`). This is a standard robustness/negative EP class

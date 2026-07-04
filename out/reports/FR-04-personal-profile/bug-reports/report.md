@@ -69,8 +69,12 @@ destructures `phone` from `req.body` and writes it to the `UPDATE` query with no
 **Expected** (per `README.md` FR-04 line 65): values matching `^0[0-9]{9,10}$` (spec-valid)
 should be accepted by the form; values not matching it should be rejected.
 
-**Actual:** frontend regex `^[1-9][0-9]{8,9}$` (`Profile.jsx` line 43) rejects `0912345678` and
-`09123456789` (both spec-valid) and accepts `1912345678` (spec-invalid).
+**Actual:** executed (not read-only): running the literal frontend regex —
+`node -e "console.log(/^[1-9][0-9]{8,9}$/.test('<value>'))"`, the exact code from
+`Profile.jsx` line 43 — against each boundary value returned `false` for `0912345678` and
+`09123456789` (both spec-valid — regex rejects them) and `true` for `1912345678`
+(spec-invalid — regex accepts it). See `ER-04-BVA-002/003/005` in
+`work/FR-04-personal-profile/execution-results.md` for the full executed set.
 
 **Steps to reproduce:**
 1. Open the Profile page in the browser.
