@@ -13,10 +13,11 @@ description: >
 
 # Domain Test Design
 
-Turns a specification and its source code into frozen, oracle-sourced test cases; the phase
+Turns a specification and its source code into frozen, oracle-sourced test cases; the stage
 order matters because an assumption must be checked for a cleaner, citation-free reframing
-(Phase B) before it is ever allowed to become the expected result of a test case (Phase C
-onward).
+(Stage 2) before it is ever allowed to become the expected result of a test case (Stage 3
+onward), and because no case may reach `frozen` (Stage 6) without a human approving the model
+it was built from.
 
 ---
 
@@ -79,8 +80,20 @@ entry.
       note buried in the model.
   - **Output:** A forbidden-state and/or immutable-state entry, if any exist.
 
-- **Step 1.4 — Log every gap as an Assumption.** For any variable with no spec rule and no
-  code constraint, write one Assumption entry with `{source, confidence, status: proposed}`.
+- **Step 1.4 — Create an Assumption wherever the model is not yet defensible:**
+  - **Input:** The model entry built so far in Steps 1.1–1.3.
+  - **Reasoning:**
+    → Do the authoritative inputs gathered so far — spec, code, outside reference — add up to
+      an oracle that could be defended if challenged, for the specific test case this variable
+      is heading toward?
+    → This is not only "there is no spec rule at all." A spec rule can exist and still fall
+      short — for example, it states a behavior but never says which part of the system must
+      enforce it, or it defines a class of values but leaves a needed detail unstated.
+    → Ignore: treating "a spec rule exists somewhere nearby" as automatically enough. Ask
+      whether it is enough for the exact oracle claim being planned, not for the variable in
+      general.
+  - **Output:** One Assumption entry `{source, confidence, status: proposed}` for every gap
+    found this way, however partial the gap is.
 
 ---
 
@@ -97,6 +110,11 @@ truly needed — this is the step that keeps an oracle honest.
     → If it names a specific responsible part of the system (for example, "the server must
       block this"), is that part actually named anywhere in the spec, the way a comparable
       rule elsewhere in the same spec might name one?
+    → **Prefer the least-committing oracle.** Even where a layer-specific claim could be
+      defended, does a path-agnostic, outcome-based version of the same claim already follow
+      from the spec just as well? If so, use that instead — state only what the spec's
+      wording actually supports, not more. Only assign responsibility to a specific layer
+      when the spec itself does.
     → If no citation exists: can the same expectation be restated as an outcome, using only
       what the spec already defines, without naming which part of the system is responsible
       (for example, "a value the spec calls invalid must never end up in the final, visible
@@ -123,7 +141,12 @@ them.
     → What are the valid and invalid classes for this variable?
     → Does behavior actually differ inside a class? If yes, split it further; if the
       behavior is the same throughout, do not split it just to add more classes.
-  - **Output:** A list of valid and invalid classes.
+    → Would splitting this class further actually change the observable behavior or the
+      expected outcome, or would the resulting classes still expect the same thing? If a
+      split would not change either one, stop there — a split that produces two classes with
+      the same expectation is not a real partition, it is over-partitioning.
+  - **Output:** A list of valid and invalid classes, each one representing a genuinely
+    different observable outcome.
 
 - **Step 3.2 — Decide what an invalid class can actually claim:**
   - **Input:** Each invalid class from Step 3.1.
@@ -146,22 +169,35 @@ them.
 
 ## Stage 4: Boundary Value Analysis
 
-**Objective:** Turn every ordered or numeric boundary into concrete boundary-point test
-cases.
+**Objective:** Turn every boundary a variable has into concrete boundary-value test cases —
+not only numeric ranges. A boundary can also be lexical (a string's length or allowed
+characters), an enum (a fixed set of allowed values), optional/presence (whether a field may
+be absent, empty, or must be populated), or structural (the size or count of a collection).
+Each kind has its own way of expressing "just inside" and "just outside."
 
-- **Step 4.1 — Read the boundary's exact wording:**
+- **Step 4.1 — Identify the boundary's kind and exact wording:**
   - **Input:** The spec's statement of the boundary.
   - **Reasoning:**
-    → Is the boundary inclusive or exclusive — does the spec say "greater than" or "greater
-      than or equal to" (and the same question at the other end)?
+    → What kind of boundary is this — a numeric/length range, a fixed set of allowed values,
+      the presence or absence of something, or the size of a collection? The right boundary
+      values depend on which kind it is.
+    → For a numeric/length range: is it inclusive or exclusive — does the spec say "greater
+      than" or "greater than or equal to" (and the same question at the other end)?
     → Does this match what a natural reading of the spec intends, or is the wording
       ambiguous enough to need its own assumption?
-  - **Output:** A confirmed inclusive/exclusive boundary definition.
+  - **Output:** A confirmed boundary definition: its kind, plus the inclusive/exclusive
+    reading if it is a range.
 
-- **Step 4.2 — Generate the boundary values.** From the confirmed boundary, list the value
-  just below the minimum, the minimum, the maximum, and the value just above the maximum;
-  add values for any second, orthogonal condition the spec also states (for example, a
-  required starting value that is separate from length).
+- **Step 4.2 — Generate the boundary values for that kind:**
+  - Numeric/length range: the value just below the minimum, the minimum, the maximum, and
+    the value just above the maximum.
+  - Enum: the first and last defined member, and one value adjacent to the set but not a
+    member of it.
+  - Optional/presence: the field entirely absent, present but empty, and present with a
+    value.
+  - Structural: the smallest and largest allowed size or count, and one step beyond each end.
+  - In every case, also add values for any second, orthogonal condition the spec states (for
+    example, a required starting value that is separate from length).
 
 - **Step 4.3 — Check for more than one enforcement path:**
   - **Input:** The boundary values from Step 4.2, plus the source-code map from Stage 1.
@@ -197,14 +233,20 @@ cases.
 **Objective:** Lock every test case to its source and its model entry before any execution
 happens.
 
-- **Step 6.1 — Record the expected-result source.** For every case, write `expected_source`
+- **Step 6.1 — Confirm human approval before anything is frozen.** A test case may not move
+  to `frozen` until a human has reviewed and approved the model entry (and every assumption or
+  reframing it rests on) it was built from. This is a rule of the method, not a detail left to
+  whoever runs it: if no such approval is recorded, stop here and get it before continuing —
+  do not freeze on the strength of the model's completeness alone.
+
+- **Step 6.2 — Record the expected-result source.** For every case, write `expected_source`
   as the spec (with its exact citation) or `assumption: <id>` — only for an assumption marked
   `accepted` in Stage 2. Never record the code or an observed result as the source.
 
-- **Step 6.2 — Link each case to its model entry.** Every test case references the exact
+- **Step 6.3 — Link each case to its model entry.** Every test case references the exact
   variable entry (Stage 1) it was derived from.
 
-- **Step 6.3 — Freeze.** Mark each case `status: frozen`. No case's expected result may be
+- **Step 6.4 — Freeze.** Mark each case `status: frozen`. No case's expected result may be
   edited after this point, and no case may be executed before this point.
 
 ---
@@ -215,8 +257,13 @@ For each variable: one Testing Model entry (`domain`, `boundary + relation + sou
 `validation rule`, `oracle`, `metadata {source, confidence, status}`), plus any
 forbidden/immutable-state entries found for it.
 
-For each spec gap: one Assumption entry (`{source, confidence, status}`), ending in
-`accepted`, `rejected`, or replaced by a reframed spec-based expectation.
+For each spec gap: one Assumption entry (`{source, confidence, status}`). The output must
+show the **final disposition of every assumption that was ever raised**, even the ones that
+turned out not to be needed — `accepted` (used as a case's oracle), `rejected` (no defensible
+citation and no reframing was possible, so the claim was dropped), or `reframed — no longer
+needed` (a path-agnostic, spec-based expectation replaced it). This is what keeps traceability
+complete: a reader can see not just which assumptions survived, but what happened to every one
+that was considered.
 
 For the feature as a whole: an Equivalence Partitioning table (one row per case: technique,
 preconditions, input, steps, expected result, `expected_source`, `status`), a Boundary Value
