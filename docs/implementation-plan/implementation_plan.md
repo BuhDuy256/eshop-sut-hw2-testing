@@ -249,11 +249,11 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 | 0 Blockers | [x] |
 | 1 Execution viability | [x] |
 | 2 Oracle precedence | [x] |
-| 3 FR-08 smoke | [ ] |
+| 3 FR-08 smoke | [x] |
 | 4 FR-04 pilot | [ ] |
 | 5 domain-test-design skill | [ ] |
 | 6 bug-reporting skill | [ ] |
 
 ## > NEXT ACTION
 
-**Do Step 3** — vertical smoke: FR-08 forged `total_amount`, one case, all six contracts, by hand. Prep `work/FR-08-checkout/` and `out/reports/FR-08-checkout/bug-reports/evidence/`, then produce the Testing Model fragment, frozen Test Case `TC-08-001`, Execution Result, Bug Report Draft (if FAIL), and AI Audit rows, committing per artifact.
+**Do Step 4** — FR-04 full pilot, by hand, through the contracts (no skills). Prep `work/FR-04-personal-profile/` and `out/reports/FR-04-personal-profile/{domain-testing,boundary-value-analysis,bug-reports/evidence}/`, then run Phase 0 discovery → Phase 1 model+assumptions (with `completeness_confirmed` human gate) → Phase 2 frozen EP/BVA test cases → Phase 3 execution+bug reporting, committing per phase.

@@ -1,0 +1,45 @@
+### FR-08 Checkout — Step 3 smoke (TC-08-001 / ER-08-001)
+### Captured post-hoc as documentation of what was actually executed via curl (Model C).
+### Not built up-front; not a test runner.
+
+### 1. Login as test user
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+  "email": "test@eshop.com",
+  "password": "Test1234!"
+}
+
+### 2. Seed cart to real total X = 30,000,000 VND
+POST http://localhost:3000/api/cart
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "name": "iPhone 15 Pro Max",
+  "price": 30000000,
+  "quantity": 1
+}
+
+### 3. Confirm cart state before checkout
+GET http://localhost:3000/api/cart
+Authorization: Bearer {{token}}
+
+### 4. Checkout with forged total_amount = 1 (input under test)
+POST http://localhost:3000/api/checkout
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "total_amount": 1,
+  "shipping_address": "123 Le Loi, TP.HCM"
+}
+
+### 5. Read back the persisted order (actual, no expected encoded here)
+GET http://localhost:3000/api/orders/my-orders
+Authorization: Bearer {{token}}
+
+### 6. Read back the persisted order by id
+GET http://localhost:3000/api/orders/1
