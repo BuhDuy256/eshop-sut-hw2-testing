@@ -81,4 +81,5 @@ rather than a code-reading impression.
 
 ## AI Gap Analysis
 
-To be completed after Phase 3 execution, per plan Step 4.6.
+See `out/reports/FR-04-personal-profile/domain-testing/report.md` — recorded once, covers both
+reports (plan Step 4.6).

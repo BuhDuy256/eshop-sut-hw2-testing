@@ -99,5 +99,30 @@ spec, frontend regex, and backend behavior).
 
 ## AI Gap Analysis
 
-To be completed after Phase 3 execution — recorded here once actual results are in, per plan
-Step 4.6 (record any case/bug the AI missed and why).
+Cases/classes the AI did not design, and why:
+
+1. **Partial update / omitted fields.** All 16 frozen cases always send `name`, `phone`, and
+   `shipping_address` together, varying only the field under test. Reading
+   `backend/server.js` `PUT /api/users/me` again while writing this analysis shows it
+   destructures all three from `req.body` unconditionally — a request that omits, say,
+   `phone` entirely would pass `undefined` into the `UPDATE` query, likely **nulling out an
+   existing value that the client never intended to touch**. This is a plausible, testable
+   defect class (an invalid/missing-field equivalence partition) that was never designed as a
+   case. **Why missed:** the plan's own worked example for Step 4.2/4.3 always showed all
+   three fields together (mirroring the frontend form, which always submits all three), which
+   anchored the test design to "always-complete body" and never prompted an EP class for
+   "request omits an updatable field." This is a prompt/scope-anchoring gap, not a tool
+   limitation — worth adding as a case if FR-04 testing continues past this pilot.
+2. **Wrong data type (not just wrong value).** All boundary/EP values for `phone`/`name` were
+   strings. No case sends a non-string type (e.g. `phone: 912345678` as a JSON number, or
+   `name: null`/`name: ["a"]`). This is a standard robustness/negative EP class
+   (type-validity, distinct from format-validity) that was not designed. **Why missed:**
+   feature-complexity triage — the pilot's scope was fixed to the format/forbidden-field risks
+   already surfaced in Phase 0/1 discovery; type-confusion testing was not prioritized within
+   this first full pilot.
+3. **Stored-XSS in `name`/`shipping_address`.** `README.md` SEC-04 requires safe escaping of
+   user-input on display; `name`/`shipping_address` are both rendered in the UI (order table,
+   profile form). No case sends an HTML/script payload in these fields. **Why missed:**
+   deliberately out of scope for this pilot — SEC-04 is a cross-cutting security rule better
+   tested once across all user-input fields (a separate, focused pass) than piecemeal inside
+   FR-04's domain/BVA pass; flagged here so it is not silently forgotten.
