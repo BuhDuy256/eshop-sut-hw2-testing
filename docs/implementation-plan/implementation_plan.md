@@ -251,10 +251,14 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 | 1 Execution viability | [x] |
 | 2 Oracle precedence | [x] |
 | 3 FR-08 smoke | [x] |
-| 4 FR-04 pilot | [ ] |
+| 4 FR-04 pilot | [x] |
 | 5 domain-test-design skill | [ ] |
 | 6 bug-reporting skill | [ ] |
 
 ## > NEXT ACTION
 
-**Do Step 4** — FR-04 full pilot, by hand, through the contracts (no skills). Prep `work/FR-04-personal-profile/` and `out/reports/FR-04-personal-profile/{domain-testing,boundary-value-analysis,bug-reports/evidence}/`, then run Phase 0 discovery → Phase 1 model+assumptions (with `completeness_confirmed` human gate) → Phase 2 frozen EP/BVA test cases → Phase 3 execution+bug reporting, committing per phase.
+**Do Step 5** — extract the `domain-test-design` skill from FR-04: write methodology notes
+from what actually worked in 4.2–4.3, run `generate-skill` to produce
+`.claude/skills/domain-test-design/SKILL.md`, validate it reproduces FR-04's EP/BVA tables
+equivalently (without overwriting the deliverable), then run the coupling smell-test grep
+(zero hits required).
