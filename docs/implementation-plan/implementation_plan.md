@@ -247,7 +247,7 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 | Step | State |
 |---|---|
 | 0 Blockers | [x] |
-| 1 Execution viability | [ ] |
+| 1 Execution viability | [x] |
 | 2 Oracle precedence | [ ] |
 | 3 FR-08 smoke | [ ] |
 | 4 FR-04 pilot | [ ] |
@@ -256,4 +256,4 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 
 ## > NEXT ACTION
 
-**Do Step 1** — validate execution viability (Model C): `docker-compose up --build`, log in as both test accounts, execute one authed request, confirm reseed is idempotent, and record the working execution command form in `docs/implementation-plan/execution-notes.md`.
+**Do Step 2** — freeze the oracle-precedence rule: write `docs/implementation-plan/oracle-precedence.md` (README.md wins on behavior, api_specification.md is shape-only, external reference only on confirmed conflict, evidence standard), then apply it on paper to the FR-08 `total_amount` contradiction and confirm it resolves deterministically.
