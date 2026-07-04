@@ -248,7 +248,7 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 |---|---|
 | 0 Blockers | [x] |
 | 1 Execution viability | [x] |
-| 2 Oracle precedence | [ ] |
+| 2 Oracle precedence | [x] |
 | 3 FR-08 smoke | [ ] |
 | 4 FR-04 pilot | [ ] |
 | 5 domain-test-design skill | [ ] |
@@ -256,4 +256,4 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
 
 ## > NEXT ACTION
 
-**Do Step 2** — freeze the oracle-precedence rule: write `docs/implementation-plan/oracle-precedence.md` (README.md wins on behavior, api_specification.md is shape-only, external reference only on confirmed conflict, evidence standard), then apply it on paper to the FR-08 `total_amount` contradiction and confirm it resolves deterministically.
+**Do Step 3** — vertical smoke: FR-08 forged `total_amount`, one case, all six contracts, by hand. Prep `work/FR-08-checkout/` and `out/reports/FR-08-checkout/bug-reports/evidence/`, then produce the Testing Model fragment, frozen Test Case `TC-08-001`, Execution Result, Bug Report Draft (if FAIL), and AI Audit rows, committing per artifact.
