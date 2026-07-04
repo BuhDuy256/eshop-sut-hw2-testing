@@ -41,5 +41,106 @@ No further backend/frontend file touches FR-04's update path.
 
 ## Phase 1 — Testing Model (variables)
 
-*(to be completed next: domain, boundary + relation + source, validation, oracle, metadata for
-`name`, `phone`, `shipping_address`; forbidden/immutable fields `role`, `email`)*
+### Variable: `name`
+
+| Field | Value |
+|---|---|
+| **Domain** | Non-empty string (per [[A2]]), unbounded length (per [[A1]]). |
+| **Boundary + relation** | No spec-stated length boundary. Empty string (`""`) is the one
+  concrete boundary this pilot tests (invalid, per A2). |
+| **Source** | `spec` (mandatory field, FR-01/FR-04) for "must be non-empty" (via A2); no
+  source for a length boundary (gap, see A1). |
+| **Validation rule** | Must not be empty. No length ceiling enforced anywhere in the SUT. |
+| **Oracle** | `README.md` FR-04 line 64 (name is a manageable profile field) + [[A2]] (accepted
+  2026-07-04). |
+| **Metadata** | `{ source: spec, confidence: MED, status: accepted }` |
+
+### Variable: `phone`
+
+| Field | Value |
+|---|---|
+| **Domain** | String representing a VN phone number. |
+| **Boundary + relation (spec)** | Must start with `0`; length 10–11 digits. BVA boundaries: 9
+  digits (invalid, too short), 10 digits (valid, min), 11 digits (valid, max), 12 digits
+  (invalid, too long); first digit `0` (valid) vs `!= 0` (invalid). `source: spec` — `README.md`
+  FR-04 line 65. |
+| **Boundary + relation (impl, frontend)** | Frontend regex `^[1-9][0-9]{8,9}$` — starts with
+  `1`–`9` (never `0`), length 9–10 digits total. **Directly contradicts the spec boundary
+  above** (e.g. a spec-valid `0912345678` is rejected client-side; a spec-invalid
+  `912345678` — no leading `0`, 9 digits — is accepted client-side). `source: impl` —
+  `frontend-web/src/pages/Profile.jsx` line 43. |
+| **Boundary + relation (impl, backend)** | No validation at all — any string is persisted.
+  `source: impl` — `backend/server.js` `PUT /api/users/me`. |
+| **Validation rule** | A value matching `^0[0-9]{9,10}$` is spec-valid; anything else is
+  spec-invalid (`README.md` line 65). No layer is named as responsible for enforcing this —
+  see [[A4]] (original "backend must enforce" assumption **rejected**, reframed below). |
+| **Oracle (reframed, path-agnostic — no assumption needed)** | `README.md` FR-04 line 65
+  defines validity directly; that definition is used as the oracle for an end-to-end outcome
+  that names no specific layer: *a spec-invalid phone value must never end up persisted in the
+  `users` table, regardless of entry path.* Two independent, spec-sourced checks follow from
+  this, neither requiring [[A4]]: (1) **UI-path** — does the frontend accept a spec-valid value
+  and reject a spec-invalid one? (2) **API-path** — does a direct API call with a spec-invalid
+  value get persisted? Both are reported against the same spec citation; the API-path result is
+  an *observation of whether the SUT upholds its own stated rule end-to-end*, not a claim about
+  which layer "should" have blocked it. |
+| **Metadata** | `{ source: spec, confidence: HIGH, status: accepted }` (the spec validity
+  definition, line 65 — always was directly spec-sourced, independent of A4); `{ source: impl,
+  confidence: HIGH, status: accepted }` (the frontend regex and backend no-validation facts,
+  logged as observations, not oracles). |
+
+### Variable: `shipping_address`
+
+| Field | Value |
+|---|---|
+| **Domain** | Free-form string. |
+| **Boundary + relation** | No spec-stated boundary. Empty string is the one concrete boundary
+  tested (valid, per [[A3]]). |
+| **Source** | `impl` (no `required` attribute; DB allows empty/`NULL`) for "empty is valid",
+  via A3. |
+| **Validation rule** | None stated by spec; no format/length constraint anywhere in the SUT. |
+| **Oracle** | [[A3]] (accepted 2026-07-04). |
+| **Metadata** | `{ source: impl, confidence: MED, status: accepted }` |
+
+### Forbidden field: `role`
+
+| Field | Value |
+|---|---|
+| **Rule** | A user must not be able to change their own `role` via the profile-update API. |
+| **Source** | `spec` — `README.md` line 67 ("không thể tự thay đổi thuộc tính `role`") and
+  SEC-06 (line 283, security requirement list). |
+| **Code-derived note (location only, not oracle)** | `backend/server.js` L118–135 **will**
+  update `role` if the client includes a truthy `role` field in the `PUT /api/users/me` body —
+  confirmed by reading the code to locate the test target, per architecture.md §2.1. |
+| **Oracle** | `README.md` line 67 / SEC-06: a `role` field in the request body must have no
+  effect on the stored `role`, regardless of what value is sent. |
+| **Metadata** | `{ source: spec, confidence: HIGH, status: accepted }` — no ambiguity; both the
+  behavioral rule and the security requirement independently state the same constraint. |
+
+### Immutable field: `email`
+
+| Field | Value |
+|---|---|
+| **Rule** | `email` cannot be changed through this feature. |
+| **Source** | `spec` — `README.md` line 66 ("Email không được phép thay đổi qua giao diện."). |
+| **Code-derived note (location only, not oracle)** | `backend/server.js`'s update query never
+  includes `email`, so even a client-supplied `email` in the request body has no effect —
+  consistent with the spec regardless of the code. |
+| **Oracle** | `README.md` line 66: an `email` field in the request body must have no effect on
+  the stored `email`. |
+| **Metadata** | `{ source: spec, confidence: HIGH, status: accepted }` |
+
+## Human review
+
+- [x] **Gate: `completeness_confirmed`** — checklist:
+  - [x] Domain complete for `name`, `phone`, `shipping_address`
+  - [x] Boundary complete (spec-derived **and** impl-derived boundaries both present for `phone`)
+  - [x] Oracle frozen or backed by an accepted assumption
+  - [x] Assumptions logged and reviewed (`work/FR-04-personal-profile/assumptions.md`):
+    A1 accepted, A2 accepted, A3 accepted, **A4 rejected as originally drafted and reframed**
+    (no defensible spec/architecture evidence for "backend must enforce" — replaced with a
+    path-agnostic, directly spec-sourced oracle requiring no assumption; see `phone` variable
+    above and `assumptions.md`).
+  - [x] Forbidden field present (`role`, SEC-06)
+  - [x] Immutable field present (`email`)
+
+  **Approved 2026-07-04**, contingent on the A4 reframing above.
