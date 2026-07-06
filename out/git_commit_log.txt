@@ -1,3 +1,64 @@
-This file should contain the full git commit log for this assignment.
-
-Populate it at the end with: git log --oneline > out/git_commit_log.txt
+e01cfa9 Update implementation_plan.md: FR-17 done, all 4 assigned features complete
+ecc0d52 Continuation FR-17 Step 5: promote and file BUG-17-001..008 (approved)
+b635e87 Continuation FR-17 Step 4b: draft 8 bug reports (bug-reporting)
+d942deb Continuation FR-17 Step 4a: execute 31 frozen cases via Model C
+a59301f Continuation FR-17 Step 3: freeze 15 EP + 16 BVA test cases (no Decision Table)
+37be4e5 Continuation FR-17 Step 1-2: build Testing Model + Assumptions (approved)
+379e71b Add .gitignore to exclude node_modules and other local artifacts
+2bb9c88 Update implementation_plan.md: FR-15 done, next is FR-17
+ea87b05 Continuation FR-15 Step 5: promote and file BUG-15-001..007 (approved)
+5182f49 Continuation FR-15 Step 4: draft 7 bug reports (bug-reporting)
+16d4247 Continuation FR-15 Step 3: execute 20 frozen cases (Model C)
+5a78a6b Continuation FR-15 Step 2: freeze EP/BVA test cases (Stage 3-6)
+b862bf4 Continuation FR-15 Step 1: build Testing Model (Stage 1-2)
+62cb3b3 Add separate, self-contained handoffs for FR-15 and FR-17
+4ab06d2 Scope correction: remove FR-09 from FR-08 (not an assigned feature)
+952b49f Continuation: file FR-04 bug reports as GitHub Issues
+dde19e3 Continuation: file FR-08 bug reports as GitHub Issues (env blocker resolved)
+96cdd79 Update continuation-handoff.md for FR-15 (supersedes FR-08 Full handoff)
+3d45427 Update implementation_plan.md: FR-08 Full done, next is FR-15/FR-17
+0b6f58e Continuation FR-08 Full Step 6: add bug-reporting Stage 7 summary
+63e92cd Continuation FR-08 Full Step 5: promote BUG-08-002..005 (approved)
+46ab960 Continuation FR-08 Full Step 4: draft 4 bug reports (bug-reporting)
+47f0d86 Continuation FR-08 Full Step 3: execute 17 frozen cases (Model C)
+1feea56 Continuation FR-08 Full Step 2: freeze EP/BVA test cases + Decision Table
+982b659 Continuation FR-08 Full Step 1: extend Testing Model (Stage 1-2)
+f4bdbd6 Add Continuation handoff for a new session (no artifact/skill changes)
+b48b1b2 Record Core Complete baseline (43defbc) and no-retroactive-edit policy for Steps 0-6
+43defbc Core-complete sweep: check off verified Step 3/4 exit criteria, fix stale assumption header
+bac537b Step 6 revision: regenerate bug-reporting skill from updated notes (no hand-patching)
+915514d Step 6 revision (notes-first): add anti-over-grouping, code-vs-evidence severity, evidence-type labeling, reclassification count
+6daaaad Step 6: extract bug-reporting skill from FR-04, validated equivalent, smell-test 0 hits
+4afc2de Step 6.1: methodology notes for bug-reporting, incorporating severity-overclaim and grouping lessons
+c7e3c22 Step 5 revision: generalize domain-test-design skill per human review
+12abbc3 Step 5: extract domain-test-design skill from FR-04, validated equivalent, smell-test 0 hits
+6952ae6 Step 5.1: methodology notes for domain-test-design, including A4 reframe-before-assumption lesson
+d812df8 Step 4 self-review: clarify BUG-04-003 as executed behavior, soften gap analysis wording
+1777666 Step 4 complete: FR-04 pilot done, all exit criteria verified
+dd0d5cd Step 4.6 FR-04 AI gap analysis: partial-update, type-confusion, XSS not covered this pilot
+b9f23f0 Step 4.5 audit: append AI Audit rows for FR-04 pilot artifacts
+723aaa5 Step 4.4 FR-04 bug reports: 4 bugs approved and promoted (local, no gh)
+31d0df0 Step 4.4 FR-04 execution: 16 cases run (6 PASS, 10 FAIL -> 4 defects), FAIL gate reviewed
+ef84047 Step 4.3 FR-04 frozen test cases: EP (6 cases) + BVA phone boundary (10 cases)
+0b27aff Step 4.2 FR-04 model+assumptions: name/phone/shipping_address, A1-A3 accepted, A4 rejected and reframed
+420f422 Step 4.1 FR-04 discovery: file map (name/phone/shipping_address, forbidden role, immutable email)
+457b1e1 Step 3 retrospective: log A3/A4 source-enum limitation as Learning Artifact
+88ba949 Step 3 self-review: ground severity in evidence, fix A4 source tag
+0396a84 Step 3.6: capture executed requests.http; Step 3 complete
+9d2b5dd Step 3.5 audit: append AI Audit rows for FR-08 smoke artifacts
+06e4ebf Step 3.4 bug report: BUG-08-001 approved and promoted (local, no gh)
+3009936 Step 3.3 execution result: TC-08-001 FAIL, confirmed real bug
+024a656 Step 3.2 frozen test case: TC-08-001 forged total_amount
+31143f3 Step 3.1 model: FR-08 total_amount testing model fragment, approved
+86a9087 Step 2: freeze oracle precedence rule
+29445fb Step 1: validate Model-C execution viability
+07d5b27 update
+e300d75 Step 0: record external blocker resolutions
+846a339 upload prompt
+9b880df upload implementation plan
+f20e43d upload generate-skill/SKILL.md
+1dffa7a set up output
+c2fc070 set up running command
+0e6350e set up Docker Compose
+85af3ba first upload
+2f9bf2b Initial commit
