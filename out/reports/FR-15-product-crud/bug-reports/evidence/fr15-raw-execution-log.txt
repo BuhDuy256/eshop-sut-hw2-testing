@@ -1,0 +1,115 @@
+=== TC-15-EP-001 happy path create (admin) ===
+{"message":"Product created","id":6}
+HTTP_STATUS:200
+
+=== TC-15-EP-002 name empty (admin) ===
+{"message":"Product created","id":7}
+HTTP_STATUS:200
+
+=== TC-15-EP-003 name omitted (admin) ===
+{"message":"Product created","id":8}
+HTTP_STATUS:200
+
+=== TC-15-EP-004 price negative (admin) ===
+{"message":"Product created","id":9}
+HTTP_STATUS:200
+
+=== TC-15-EP-005 category_id nonexistent (admin) ===
+{"message":"Product created","id":10}
+HTTP_STATUS:200
+
+=== GET /api/products after EP-001..005 (list, to inspect persisted state) ===
+[{"id":1,"name":"iPhone 15 Pro Max","price":30000000,"description":"Điện thoại cao cấp của Apple","imageUrl":"https://placehold.co/300x300/png?text=iPhone+15","category_id":1},{"id":2,"name":"Samsung Galaxy S24 Ultra","price":28000000,"description":"Màn hình hiển thị xuất sắc, camera siêu zoom","imageUrl":"https://placehold.co/300x300/png?text=Samsung+S24","category_id":1},{"id":3,"name":"MacBook Pro M3","price":45000000,"description":"Laptop chuyên nghiệp mạnh mẽ","imageUrl":"https://placehold.co/300x300/png?text=Macbook+Pro","category_id":2},{"id":4,"name":"Tai nghe AirPods Pro 2","price":6000000,"description":"Chống ồn chủ động xuất sắc","imageUrl":"https://placehold.co/300x300/png?text=AirPods+Pro","category_id":3},{"id":5,"name":"Bàn phím cơ Keychron Q1","price":4000000,"description":"Gõ cực sướng, thiết kế kim loại","imageUrl":"https://placehold.co/300x300/png?text=Keychron+Q1","category_id":3},{"id":6,"name":"BVA Test Product 001","price":500000,"description":"test","imageUrl":"https://placehold.co/300","category_id":2},{"id":7,"name":"","price":500000,"description":"test","imageUrl":"https://placehold.co/300","category_id":2},{"id":8,"name":null,"price":500000,"description":"test","imageUrl":"https://placehold.co/300","category_id":2},{"id":9,"name":"BVA Test Product 004","price":-500000,"description":"test","imageUrl":"https://placehold.co/300","category_id":2},{"id":10,"name":"BVA Test Product 005","price":500000,"description":"test","imageUrl":"https://placehold.co/300","category_id":999}]
+=== TC-15-EP-006 POST no Authorization header ===
+{"message":"Product created","id":11}
+HTTP_STATUS:200
+
+=== TC-15-EP-007 POST valid user-role JWT ===
+{"message":"Product created","id":12}
+HTTP_STATUS:200
+
+=== GET /api/products after EP-006/007 (check for Unauth/User Role products) ===
+[
+  {
+    id: 11,
+    name: 'Unauth Create Test',
+    price: 100000,
+    description: 'test',
+    imageUrl: 'https://placehold.co/300',
+    category_id: 1
+  },
+  {
+    id: 12,
+    name: 'User Role Create Test',
+    price: 100000,
+    description: 'test',
+    imageUrl: 'https://placehold.co/300',
+    category_id: 1
+  }
+]
+
+=== Create throwaway products for EP-008/009/010 (admin, authenticated) ===
+{"message":"Product created","id":13}
+{"message":"Product created","id":14}
+{"message":"Product created","id":15}
+{"message":"Product created","id":16}
+=== TC-15-EP-008 PUT /api/products/13 no Authorization header ===
+{"message":"Product updated"}
+HTTP_STATUS:200
+
+--- GET /api/products/13 after attempted unauth PUT ---
+{"id":13,"name":"HACKED","price":1,"description":"test","imageUrl":"https://placehold.co/300","category_id":1}
+=== TC-15-EP-009 DELETE /api/products/14 no Authorization header ===
+{"message":"Product deleted"}
+HTTP_STATUS:200
+
+--- GET /api/products/14 after attempted unauth DELETE ---
+{}
+HTTP_STATUS:200
+
+=== TC-15-EP-010 edit-isolation backend: PUT /api/products/15 (admin), check sibling 16 ===
+--- sibling id=16 BEFORE edit ---
+{"id":16,"name":"Throwaway Sibling","price":"444444","description":"throwaway","imageUrl":"https://placehold.co/300","category_id":1}
+{"message":"Product updated"}
+HTTP_STATUS:200
+
+--- sibling id=16 AFTER edit of 15 ---
+{"id":16,"name":"Throwaway Sibling","price":"444444","description":"throwaway","imageUrl":"https://placehold.co/300","category_id":1}
+--- target id=15 AFTER edit (confirm it changed) ---
+{"id":15,"name":"Edited Name","price":999999,"description":"edited","imageUrl":"https://placehold.co/300","category_id":2}
+=== TC-15-BVA-001 name length=1 ===
+{"message":"Product created","id":17}
+HTTP_STATUS:200
+
+=== TC-15-BVA-002 name length=255 ===
+{"message":"Product created","id":18}
+HTTP_STATUS:200
+
+=== TC-15-BVA-003 name length=256 ===
+{"message":"Product created","id":19}
+HTTP_STATUS:200
+
+=== TC-15-BVA-004 price=-1 ===
+{"message":"Product created","id":20}
+HTTP_STATUS:200
+
+=== TC-15-BVA-005 price=0 ===
+{"message":"Product created","id":21}
+HTTP_STATUS:200
+
+=== TC-15-BVA-006 price=1 ===
+{"message":"Product created","id":22}
+HTTP_STATUS:200
+
+=== TC-15-BVA-007 category_id=1 (first) ===
+{"message":"Product created","id":23}
+HTTP_STATUS:200
+
+=== TC-15-BVA-008 category_id=3 (last) ===
+{"message":"Product created","id":24}
+HTTP_STATUS:200
+
+=== TC-15-BVA-009 category_id=4 (adjacent, nonexistent) ===
+{"message":"Product created","id":25}
+HTTP_STATUS:200
+
