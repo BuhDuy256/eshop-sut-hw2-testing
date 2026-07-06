@@ -276,8 +276,27 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
    panel's edit form locally overwrites every visible product's name, not just the edited one).
    All approved and filed as GitHub issues #10-#16. FR-17 next. See
    `work/FR-15-product-crud/*` and the AI Audit (`[AI-02]`, Artifacts #15-18) for full detail.
-3. FR-17 (through skills). **Not started.**
-4. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Not started.**
+3. ~~FR-17 (through skills).~~
+   **Done, 2026-07-07.** Built the Testing Model from scratch via `domain-test-design` Stage
+   1-2 (`code` uniqueness, `type` enum, `discount_value` positivity, `expired_at` presence,
+   `min_order_amount >= 0`, `max_uses_per_user >= 1`, and an actor/role forbidden state
+   broadened to cover View + Create + Delete — not just CUD like FR-15 — since FR-17's own
+   spec line bundles Xem into the admin-only clause directly), human-approved
+   (`completeness_confirmed`). Designed 15 EP + 16 BVA cases (Stage 3-4), including a
+   dedicated 6-point boundary set isolating `max_uses_per_user`'s `\|\| 1` falsy/truthy
+   coercion asymmetry; genuinely re-checked Stage 5 against FR-17's own code paths and skipped
+   the Decision Table (no conditions combine), froze and committed all 31 before execution.
+   Executed via Model C against the live SUT (manual `node` start — Docker Desktop unreachable
+   this session, same fallback as FR-15); confirmed all 16 FAILs as real defects via
+   `bug-reporting`, grouped into 8 confirmed defects (1 Critical — `POST
+   /api/admin/coupons` has no access control; 2 High — `discount_value` has zero validation,
+   `GET /api/coupons` has no access control, rated separately from the Critical write-endpoint
+   bug by proven read-vs-write impact; 5 Medium — `code`/`type`/`expired_at`/`min_order_amount`
+   zero validation, plus the `max_uses_per_user` asymmetric-fallback logic bug). All approved
+   and filed as GitHub issues #17-#24. See `work/FR-17-coupon-crud/*` and the AI Audit
+   (`[AI-02]`, Artifacts #19-22) for full detail. **All 4 assigned features (FR-04, FR-08,
+   FR-15, FR-17) are now complete.**
+4. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Not started — next action.**
 
 ---
 
@@ -310,8 +329,10 @@ baseline is consistent across plan/artifacts/git history, all exit criteria carr
 both skills are extracted/validated/smell-tested through two review rounds, and all three
 Human Gates + structural guards are demonstrated by real execution — not just asserted.
 
-**FR-08 Full and FR-15 are both done** (see "Continuation" section above). **FR-17 (Coupon
-Management CRUD) is next** — the last of the 4 assigned features, driven through the same two
-frozen skills. See the "Continuation" section above for the baseline-protection rule (Steps
-0–6, FR-08 Full, and FR-15's frozen artifacts are not to be retroactively edited except for a
-genuine defect) that applies from here on.
+**FR-08 Full, FR-15, and FR-17 are all done** (see "Continuation" section above). **All 4
+assigned features are complete.** Remaining work is the Continuation item 4 globals: `out/
+README.md` self-assessment + test summary, `out/ai-critique.md`, finalizing `[AI-02]/[AI-03]/
+[AI-05]`, `git log --oneline > out/git_commit_log.txt`, and the end-to-end skill demo video.
+See the "Continuation" section above for the baseline-protection rule (Steps 0–6 and all four
+features' frozen artifacts are not to be retroactively edited except for a genuine defect) that
+applies from here on.
