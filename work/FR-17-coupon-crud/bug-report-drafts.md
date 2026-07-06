@@ -25,7 +25,7 @@
 | **Severity** | Medium — a required identifier field can be created with a `null` value, contrary to `README.md` FR-17 line 216. Proven mechanism is limited to persistence: this pass did not execute the customer-facing apply-coupon lookup (`WHERE code = ?`, FR-09, out of scope) against a null-code row, so no downstream lookup-failure chain is claimed as demonstrated — only that a required field is missing entirely from a persisted coupon. |
 | **Priority** | Medium — reachable only by an actor bypassing the admin form's client-side `required` attribute (a direct API call), not by normal UI use. |
 | **Ref** | `TC-17-EP-003` / `ER-17-EP-003` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#17](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/17) |
 
 **Expected** (per `README.md` FR-17 line 216, oracle): `code` is a required field; an omitted
 `code` must not end up persisted as `null`.
@@ -56,7 +56,7 @@ into the parameterized `INSERT` with no presence check; `coupons.code` (database
 | **Severity** | Medium — a required enum field (`percent`/`fixed`) can be created with an arbitrary string, a case-variant of a valid member, or `null`. `type` determines which discount-calculation branch the (out-of-scope, FR-09) apply-coupon logic takes; this pass did not execute that calculation against an invalid `type`, so no proven miscalculation is claimed — only that the field's own required/enum constraint is entirely unenforced at creation. |
 | **Priority** | Medium — reachable only via a direct API call; the admin form's fixed 2-option `<select>` cannot submit a third value through normal UI use. |
 | **Ref** | `TC-17-EP-004`/`ER-17-EP-004`, `TC-17-EP-005`/`ER-17-EP-005`, `TC-17-BVA-015`/`ER-17-BVA-015` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#18](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/18) |
 
 **Expected** (per `README.md` FR-17 line 216, oracle): `type` must be exactly `"percent"` or
 `"fixed"`; a missing or non-member value must not end up persisted as given.
@@ -90,7 +90,7 @@ binds SQL `NULL` rather than triggering the schema default.
 | **Severity** | High — `discount_value` is core transactional data feeding the (out-of-scope, FR-09) discount-amount calculation; a zero or negative value, if ever reached by that calculation, could produce an incorrect final charge (e.g., a negative `fixed` discount would *increase* `final_amount` above the order total). Proven mechanism is limited to **persistence**: this pass did not execute the apply-coupon/checkout flow against one of these corrupted coupons, so no end-to-end financial-loss chain is claimed as demonstrated — only that invalid discount data enters and stays in the system with no server-side gate at all, the same discipline applied to FR-15's analogous `price` finding (`BUG-15-002`). |
 | **Priority** | High |
 | **Ref** | `TC-17-EP-006`/`ER-17-EP-006`, `TC-17-BVA-001`/`ER-17-BVA-001`, `TC-17-BVA-002`/`ER-17-BVA-002` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#19](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/19) |
 
 **Expected** (per `README.md` FR-17 line 216, oracle): `discount_value` must be `> 0`; a value
 `≤ 0` must not end up persisted.
@@ -120,7 +120,7 @@ check; `coupons.discount_value` (database.js line 33) is `INTEGER` with no `CHEC
 | **Severity** | Medium — a required date field can be created with `null` or an empty string. `expired_at` gates the (out-of-scope, FR-09) expiry check (`new Date(coupon.expired_at) < now`); this pass did not execute that check against a null/empty value, so no proven "coupon never expires" consequence is claimed — only that the field's own required-ness is entirely unenforced at creation. |
 | **Priority** | Medium — reachable only via a direct API call bypassing the admin form's `required` attribute. |
 | **Ref** | `TC-17-EP-007`/`ER-17-EP-007`, `TC-17-BVA-016`/`ER-17-BVA-016` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#20](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/20) |
 
 **Expected** (per `README.md` FR-17 line 216, oracle): `expired_at` is required; an omitted or
 empty value must not end up persisted.
@@ -149,7 +149,7 @@ as `""` (id 32). Both confirmed via a follow-up `GET`.
 | **Severity** | Medium — a required, non-negative threshold field can be created negative or `null`. `min_order_amount` gates the (out-of-scope, FR-09) minimum-order check; this pass did not execute that check against a negative/null threshold, so no proven bypass-of-minimum-order chain is claimed — only that the field's own `>= 0` and required-ness constraints are entirely unenforced at creation. |
 | **Priority** | Medium — reachable only via a direct API call; the admin form's own local state defaults this field to `0` (a valid value) when untouched. |
 | **Ref** | `TC-17-EP-008`/`ER-17-EP-008`, `TC-17-EP-009`/`ER-17-EP-009`, `TC-17-BVA-004`/`ER-17-BVA-004` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#21](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/21) |
 
 **Expected** (per `README.md` FR-17 line 216, oracle): `min_order_amount` must be `>= 0` and is
 a required field; a negative value or an omitted field must not end up persisted as given.
@@ -182,7 +182,7 @@ request field binds SQL `NULL` rather than triggering the schema default.
 | **Severity** | Medium — unlike the fields above, this one has a real (if incomplete) protection mechanism; the proven gap is narrower: only a *negative* `max_uses_per_user` value bypasses it. `max_uses_per_user` gates the (out-of-scope, FR-09) per-user usage-limit check (`usage_count >= coupon.max_uses_per_user`); this pass did not execute that check against a negative limit, so no proven "coupon unusable from first attempt" consequence is claimed — only that a value `< 1` can persist unprotected, contrary to `README.md` FR-17 line 216. |
 | **Priority** | Medium — reachable only via a direct API call sending a negative number; the admin form's `min="1"` (client-side only) and default value of `1` mean normal UI use never produces this input. |
 | **Ref** | `TC-17-EP-010`/`ER-17-EP-010`, `TC-17-BVA-010`/`ER-17-BVA-010` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#22](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/22) |
 
 **Expected** (per `README.md` FR-17 line 216, oracle): `max_uses_per_user` must be `>= 1`; a
 value `< 1` must not end up persisted as given.
@@ -217,7 +217,7 @@ fallback entirely.
 | **Severity** | High — a security boundary explicitly required by `README.md` FR-17 line 215 ("Admin có thể ... Xem ... mã giảm giá") and `SEC-03` is completely absent: evidence proves a non-admin authenticated user can retrieve the full coupon list, including every code, discount value, and threshold. Rated High rather than Critical: the proven impact is unauthorized **read** disclosure of coupon terms, not data creation/modification/deletion (contrast with `BUG-17-008` and FR-15's `BUG-15-004/005/006`, which are unauthorized **writes**). |
 | **Priority** | High |
 | **Ref** | `TC-17-EP-012`/`ER-17-EP-012` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#23](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/23) |
 
 **Expected** (per `README.md` FR-17 line 215 + `SEC-03`, oracle): `GET /api/coupons` must
 require a valid JWT with `role='admin'`; a request from a non-admin (or unauthenticated) actor
@@ -248,7 +248,7 @@ inspects `req.user.role`.
 | **Severity** | Critical — a security boundary explicitly required by `README.md` FR-17 line 215, FR-12 lines 176–179, and `SEC-03` is completely absent: evidence proves a non-admin authenticated user can create an arbitrary coupon with no compensating control anywhere in the route — an unauthorized **write**, the same class of finding as FR-15's `BUG-15-004` (rated Critical there for the analogous product-creation endpoint). |
 | **Priority** | P1 |
 | **Ref** | `TC-17-EP-014`/`ER-17-EP-014` |
-| **GitHub Issue** | _(pending — filed after approval)_ |
+| **GitHub Issue** | [#24](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/24) |
 
 **Expected** (per `README.md` FR-17 line 215 + FR-12 lines 176–179 + `SEC-03`, oracle):
 `POST /api/admin/coupons` must require a valid JWT with `role='admin'`; a request from a
@@ -300,4 +300,8 @@ assumption-grounded claims and no reclassifications between the two categories i
 (Assumption A1 was used only to pick a concrete BVA value for a PASS case, not as any confirmed
 defect's oracle).
 
-**Awaiting Stage 6 human gate — approval requested per report, not as one blanket batch.**
+**Stage 6 human gate: approved 2026-07-07** (user: "Approve." — blanket approval of all 8
+presented drafts, no report held back). All 8 promoted verbatim to
+`out/reports/FR-17-coupon-crud/bug-reports/report.md` and filed as GitHub issues
+[#17](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/17)–[#24](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/24)
+(same day, `gh` already authenticated, Issues already enabled).
