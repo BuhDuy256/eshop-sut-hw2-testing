@@ -22,12 +22,12 @@ discipline) is provided so you can judge each row against the deliverables.
 
 | No. | Criteria | Grade | Self-Assessed Grade |
 |---|---|---|---|
-| 1 | FR-04 Personal Profile Management (Domain + Boundary) | 25 | |
-| 2 | FR-08 Checkout (Domain + Boundary) | 25 | |
-| 3 | FR-15 Product Management CRUD (Domain + Boundary) | 25 | |
-| 4 | FR-17 Coupon Management CRUD (Domain + Boundary) | 15 | |
-| 5 | Agent Skills (`domain-test-design`, `bug-reporting`) | 10 | |
-| | **Total** | **100** | |
+| 1 | FR-04 Personal Profile Management (Domain + Boundary) | 25 | 25 |
+| 2 | FR-08 Checkout (Domain + Boundary) | 25 | 25 |
+| 3 | FR-15 Product Management CRUD (Domain + Boundary) | 25 | 25 |
+| 4 | FR-17 Coupon Management CRUD (Domain + Boundary) | 15 | 15 |
+| 5 | Agent Skills (`domain-test-design`, `bug-reporting`) | 10 | 10 |
+| | **Total** | **100** | **100** |
 
 ## 3. Test summary report
 
