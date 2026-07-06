@@ -1,14 +1,23 @@
 # FR-08 — Bug Report
 
 > Scope note: this report holds the Step-3 vertical-smoke bug (`BUG-08-001`) plus the
-> Continuation FR-08 Full pass below (`BUG-08-002..005`), added 2026-07-04. All 5 were
-> originally promoted with local evidence only — GitHub issue filing was blocked (first by
-> `gh` not being installed at Step 0, then by the repository having Issues disabled entirely).
-> **Update 2026-07-04 (later the same day):** Issues have been enabled on the repository and
-> `gh` is authenticated; all 5 approved reports below have now been filed verbatim as GitHub
-> issues (#1–#5), with no change to any technical content (title, severity, priority,
-> expected, actual, repro, root cause, or evidence) — only the `GitHub Issue` field per bug was
-> updated.
+> Continuation FR-08 Full pass below (`BUG-08-002`), added 2026-07-04. Both were originally
+> promoted with local evidence only — GitHub issue filing was blocked (first by `gh` not being
+> installed at Step 0, then by the repository having Issues disabled entirely). **Update
+> 2026-07-04 (later the same day):** Issues have been enabled on the repository and `gh` is
+> authenticated; both approved reports below have now been filed verbatim as GitHub issues
+> (#1, #2), with no change to any technical content — only the `GitHub Issue` field per bug
+> was updated.
+>
+> **Correction, 2026-07-04 (same day):** this report originally also included `BUG-08-003`
+> (apply-coupon auth/usage-cap bypass), `BUG-08-004` (percent discount formula), and
+> `BUG-08-005` (C3 boundary `>` vs `>=`) — all three about FR-09 (customer-facing coupon
+> application), which is **not** one of the 4 assigned features
+> (`docs/hw2-reqs/features-that-need-testing.md`). The assigned coupon-related feature, FR-17,
+> is a different feature (admin Coupon CRUD). These 3 bug reports have been removed from this
+> deliverable. GitHub issues #3–#5 (already filed for them) are left open and unedited — they
+> document real defects, just outside this student's graded FR-08 scope. See the AI Audit for
+> the corrective entry.
 
 ## BUG-08-001 — Checkout persists client-forged `total_amount` instead of the server-recomputed cart total
 
@@ -75,119 +84,20 @@ the file clears or resets it after an order is created.
 
 ---
 
-## BUG-08-003 — `POST /api/apply-coupon` enforces no authentication — identity and usage-cap can both be bypassed
-
-| Field | Value |
-|---|---|
-| **Severity** | Critical — README FR-09 row C4 states a coupon requires a valid JWT, and row C5 states a per-user usage cap; evidence directly proves neither is enforced by any code path on this endpoint, and that the one client-supplied field (`user_id`) the code uses as an identity proxy can simply be omitted to bypass the usage cap too — for any unauthenticated caller, on any coupon. Not extended beyond what was proven: whether `apply-coupon`'s output is later trusted uncritically by an authenticated `checkout` call was not tested — the claim is scoped to `apply-coupon`'s own missing authentication and defeated usage cap. |
-| **Priority** | P1 |
-| **Ref** | `TC-08-EP-008` / `ER-08-EP-008` and `TC-08-DT-002` / `ER-08-DT-002` |
-| **GitHub Issue** | [#3](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/3) — filed 2026-07-04 after Issues were enabled on the repository. |
-
-**Expected** (per `README.md` FR-09 rows C4 and C5, reframed outcome-level per Testing Model
-Assumption A7): a coupon must not be applied for a request that presents no valid JWT, and a
-user's usage-per-coupon cap must hold regardless of what identity, if any, the request claims.
-
-**Actual:** (1) A request with no `Authorization` header and `user_id: 1` (the admin account,
-not the requester) received a successful discount. (2) A coupon confirmed exhausted for a real,
-authenticated user moments earlier was successfully re-applied by simply omitting `user_id`
-and the token entirely.
-
-**Steps to reproduce:** see the two scenarios in the evidence file.
-
-**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
-`POST /api/apply-coupon` (line 363) carries no `authenticateToken` middleware; it reads
-`user_id` directly from the untrusted request body (lines 364, 386) and only runs the
-usage-cap check (C5) inside an `if (user_id)` branch — omitting the field skips that check
-entirely.
-
-**Evidence:** [`evidence/BUG-08-003-request-response.txt`](evidence/BUG-08-003-request-response.txt)
-(raw request/response capture — API-level bug, no browser involved).
-
----
-
-## BUG-08-004 — Percent-type coupon discount formula returns a large negative discount
-
-| Field | Value |
-|---|---|
-| **Severity** | Critical — the discount/final-amount calculation is a core computed value for every percent-type coupon (not a rare edge case — `SAVE10` is the system's flagship percent coupon), and evidence proves it returns a result inverted and inflated far beyond the original total. Not extended beyond what was proven: whether this incorrect `final_amount` is ever actually charged to a customer was not tested (no payment step exists in this SUT to observe). |
-| **Priority** | P1 |
-| **Ref** | `TC-08-EP-010` / `ER-08-EP-010` |
-| **GitHub Issue** | [#4](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/4) — filed 2026-07-04 after Issues were enabled on the repository. |
-
-**Expected** (per `README.md` FR-09 "Công thức tính giảm giá," percent type):
-`discount_amount = total × discount_value / 100`. For `total_amount = 1,000,000`,
-`discount_value = 10`: `discount_amount = 100,000`, `final_amount = 900,000`.
-
-**Actual:** `discount_amount = -9,000,000`, `final_amount = 10,000,000`.
-
-**Steps to reproduce:** 1. Login as a user who has not yet used `SAVE10`. 2. `POST
-/api/apply-coupon` `{"code":"SAVE10","total_amount":1000000,"user_id":<id>}`. 3. Observe
-`discount_amount`/`final_amount` in the response.
-
-**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
-lines 398-401/417-421 compute, for `type === "percent"`:
-`discount_amount = Math.floor(total_amount * (1 - coupon.discount_value))`. Seed data stores
-`discount_value` as a whole-number percent (`10`, not `0.10`), so this evaluates to
-`total_amount × (1 − 10) = total_amount × −9`. The `fixed`-type branch matches the spec exactly
-and is unaffected (confirmed passing in `TC-08-EP-011`).
-
-**Evidence:** [`evidence/BUG-08-004-request-response.txt`](evidence/BUG-08-004-request-response.txt)
-(raw request/response capture — API-level bug, no browser involved).
-
----
-
-## BUG-08-005 — Coupon order-threshold check rejects the exact boundary (`>` instead of the spec's `>=`)
-
-| Field | Value |
-|---|---|
-| **Severity** | Medium — a defined, named business rule (README FR-09 row C3, explicitly stated as inclusive) is violated at exactly one point: an order whose total exactly equals a coupon's minimum threshold is wrongly denied the discount it is entitled to. Proven narrowly: the value just below and just above both behave correctly under either reading; only the boundary point itself diverges. |
-| **Priority** | Medium |
-| **Ref** | `TC-08-BVA-001/002/003` / `ER-08-BVA-001/002/003` |
-| **GitHub Issue** | [#5](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/5) — filed 2026-07-04 after Issues were enabled on the repository. |
-
-**Expected** (per `README.md` FR-09 row C3, "Tổng đơn hàng >= (lớn hơn hoặc bằng)
-min_order_amount"): a coupon is usable when `total_amount >= min_order_amount`, including
-equality. For `SAVE10` (`min_order_amount = 300,000`), `total_amount = 300,000` must be
-accepted.
-
-**Actual:** `total_amount = 300,000` is rejected with the same "insufficient total" error as a
-value below the threshold.
-
-**Steps to reproduce:** 1. Login. 2. `POST /api/apply-coupon`
-`{"code":"SAVE10","total_amount":300000,"user_id":<id>}` (a coupon not yet exhausted for this
-user). 3. Observe the rejection.
-
-**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js:379`:
-`if (total_amount > coupon.min_order_amount)` — strictly exclusive, rather than the spec's
-inclusive `>=`.
-
-**Evidence:** [`evidence/BUG-08-005-request-response.txt`](evidence/BUG-08-005-request-response.txt)
-(raw request/response capture — API-level bug, no browser involved).
-
----
-
 ## Summary
 
 **Step-3 smoke:** 1 case executed, 1 confirmed defect (`BUG-08-001`).
 
-**Continuation FR-08 Full:** 17 cases executed (10 EP, 6 BVA counted at their final clean
-result + 1 confounded-then-reseeded re-run, 1 Decision Table case) — 13 passed, 5 failed,
-grouped into 4 confirmed defects (`BUG-08-002` groups 2 failing cases under one root cause;
-`BUG-08-004`/`BUG-08-005` are each 1 failing case). No failure was rejected as a test/setup
-artifact.
+**Continuation FR-08 Full:** 3 cases executed (auth-state ×2, cart-clearing ×1) — 2 passed,
+1 failed, confirmed as `BUG-08-002`. No failure was rejected as a test/setup artifact.
 
-**By severity (Continuation batch):** Critical — 2 (`BUG-08-003`, `BUG-08-004`). Medium — 2
-(`BUG-08-002`, `BUG-08-005`).
+**By severity:** Critical — 1 (`BUG-08-001`). Medium — 1 (`BUG-08-002`).
 
-**Evidence basis:** all 5 confirmed defects (`BUG-08-001..005`) are `spec`-grounded —
-every expected result traces directly to a README FR-08/FR-09 citation. None rest on an
-unresolved assumption; the two candidate assumptions that touched this batch (A6, A7) were
-each reframed at the modeling stage into a direct, path-agnostic spec reading before any test
-case was written, so no bug report needed to lean on an assumption's credibility. Zero
-reclassifications between spec-grounded and assumption-grounded during this review.
+**Evidence basis:** both confirmed defects (`BUG-08-001`, `BUG-08-002`) are `spec`-grounded —
+every expected result traces directly to a README FR-08 citation. No assumption-grounded
+claims in this scope.
 
-**GitHub filing:** all 5 bugs are now filed as GitHub issues (#1–#5), as of 2026-07-04, later
-the same day Issues were enabled on the repository — see `work/FR-08-checkout/bug-report-drafts.md`
+**GitHub filing:** both bugs are filed as GitHub issues (#1, #2), as of 2026-07-04, the same
+day Issues were enabled on the repository — see `work/FR-08-checkout/bug-report-drafts.md`
 for the resolution note. Filed verbatim from the already-approved content; no technical field
 was changed.
