@@ -65,18 +65,18 @@ assignment. FR-17's `GET /api/coupons` extends this pattern to a read endpoint a
 
 ## 4. Demo videos
 
-_(pending — record one end-to-end skill demonstration per
-`docs/implementation-plan/implementation_plan.md` Continuation item 4, §7; link here once
-recorded)._
+- End-to-end skill demonstration: https://www.youtube.com/watch?v=W6TxiZhdteY
 
 ## 5. Deliverable index
 
-- Domain Testing + Boundary Value Analysis reports: `out/reports/FR-{04,08,15,17}-*/{domain-testing,boundary-value-analysis}/report.md`
-- Bug reports (with GitHub Issue links): `out/reports/FR-{04,08,15,17}-*/bug-reports/report.md`
-- AI Audit Report: `out/ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md` (22 artifacts logged)
-- AI Disclosure Form: `out/ai-declaration/03-disclosure-form/[AI-03] - FIT@HCMUS - AI Disclosure Form_En.docx.md`
-- AI Privacy Checklist: `out/ai-declaration/05-privacy-checklist/[AI-05] - FIT@HCMUS - AI Privacy Checklist_En.docx.md`
-- AI Critique: `out/ai-critique.md`
-- Git commit log: `out/git_commit_log.txt` (64 commits)
+*Paths below are relative to this `out/` folder, which is zipped as the submission root.*
+
+- Domain Testing + Boundary Value Analysis reports: `reports/FR-{04,08,15,17}-*/{domain-testing,boundary-value-analysis}/report.md`
+- Bug reports (with GitHub Issue links): `reports/FR-{04,08,15,17}-*/bug-reports/report.md`
+- AI Audit Report: `ai-declaration/02-audit/[AI-02] - FIT@HCMUS - AI Audit Report_En.docx.md` (22 artifacts logged)
+- AI Disclosure Form: `ai-declaration/03-disclosure-form/[AI-03] - FIT@HCMUS - AI Disclosure Form_En.docx.md`
+- AI Privacy Checklist: `ai-declaration/05-privacy-checklist/[AI-05] - FIT@HCMUS - AI Privacy Checklist_En.docx.md`
+- AI Critique: `ai-critique.md`
+- Git commit log: `git_commit_log.txt` (64 commits)
 - Reusable skills: `.claude/skills/domain-test-design/SKILL.md`, `.claude/skills/bug-reporting/SKILL.md`
-- Architecture / process documentation: `docs/architecture/architecture.md`, `docs/implementation-plan/implementation_plan.md`
+- Architecture / process documentation: `docs/architecture.md`, `docs/implementation_plan.md`
