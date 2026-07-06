@@ -1,6 +1,248 @@
 # FR-15 — Bug Report
 
-This file should contain all bugs discovered while testing FR-15 Product Management CRUD, including:
-- Bug ID, title, severity, steps to reproduce, expected vs actual result
-- Link to the corresponding GitHub Issue
-- Screenshot evidence for each bug
+## BUG-15-001 — `name` has zero server-side validation
+
+| Field | Value |
+|---|---|
+| **Severity** | Medium — a data-integrity defect in the product catalog (blank, `null`, or 256+ character names persist and are returned by `GET /api/products`), degrading customer-facing display data. No security boundary or financial value is affected; not classified higher. |
+| **Priority** | Medium — reachable only by an actor bypassing the admin form's client-side `required` (a direct API call), not by normal UI use. |
+| **Ref** | `TC-15-EP-002`/`ER-15-EP-002`, `TC-15-EP-003`/`ER-15-EP-003`, `TC-15-BVA-003`/`ER-15-BVA-003` |
+| **GitHub Issue** | [#10](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/10) |
+
+**Expected** (per `README.md` FR-15 line 195, oracle): a `name` that is empty, absent, or
+exceeds 255 characters must not end up persisted as given.
+
+**Actual:** three distinct invalid inputs were each accepted and persisted verbatim:
+`name:""` → persisted as `""` (id 7); `name` key omitted → persisted as `null` (id 8); a
+256-character string → persisted at full length 256 (id 19). All confirmed via a follow-up
+`GET`.
+
+**Steps to reproduce:**
+1. Login as admin.
+2. `POST /api/products` with `name:""` (or omit `name`, or send a 256-char string), valid
+   `price`/`category_id`.
+3. `GET /api/products/:id` for the returned id — observe the invalid `name` persisted
+   unchanged.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
+`POST`/`PUT /api/products` (lines 167–189) bind `name` straight into the SQL statement with no
+check; `products.name` (database.js line 66) has no `NOT NULL`/`CHECK` constraint.
+
+**Evidence:** [`evidence/fr15-raw-execution-log.txt`](evidence/fr15-raw-execution-log.txt),
+sections `TC-15-EP-002`, `TC-15-EP-003`, `TC-15-BVA-003` (raw request/response capture,
+API-level bug, no browser involved).
+
+---
+
+## BUG-15-002 — `price` has zero server-side validation
+
+| Field | Value |
+|---|---|
+| **Severity** | High — `price` is core transactional catalog data; a negative or zero value corrupts the one field that customer-facing product display, cart totals, and the admin revenue dashboard (`README.md` FR-13, line 183) would all read from. Proven mechanism is limited to **persistence**: this pass did not execute a cart/checkout flow against one of these corrupted products, so no end-to-end financial-loss chain is claimed as demonstrated — only that invalid pricing data enters and stays in the system with no server-side gate at all. |
+| **Priority** | High |
+| **Ref** | `TC-15-EP-004`/`ER-15-EP-004`, `TC-15-BVA-004`/`ER-15-BVA-004`, `TC-15-BVA-005`/`ER-15-BVA-005` |
+| **GitHub Issue** | [#11](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/11) |
+
+**Expected** (per `README.md` FR-15 line 196, oracle): a `price ≤ 0` must not end up persisted.
+
+**Actual:** `price:-500000` → persisted as `-500000` (id 9). `price:-1` → persisted as `"-1"`
+(id 20, id-parity string coercion, value still -1). `price:0` → persisted as `0` (id 21). All
+confirmed via a follow-up `GET`.
+
+**Steps to reproduce:**
+1. Login as admin.
+2. `POST /api/products` with `price:-1` (or `0`, or any negative number), valid
+   `name`/`category_id`.
+3. `GET /api/products/:id` — observe the invalid `price` persisted unchanged.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
+`POST`/`PUT /api/products` bind `price` straight into the SQL statement with no check;
+`products.price` (database.js line 67) is `INTEGER` with no `CHECK (price > 0)`.
+
+**Evidence:** [`evidence/fr15-raw-execution-log.txt`](evidence/fr15-raw-execution-log.txt),
+sections `TC-15-EP-004`, `TC-15-BVA-004`, `TC-15-BVA-005`.
+
+---
+
+## BUG-15-003 — `category_id` is never checked against existing categories
+
+| Field | Value |
+|---|---|
+| **Severity** | Medium — a dangling-reference data-integrity defect (a product can reference a category that does not exist), likely to affect category-filtered browsing; that downstream surface was not itself executed in this pass, so no broken-browsing behavior is claimed as proven, only the dangling reference itself. |
+| **Priority** | Medium |
+| **Ref** | `TC-15-EP-005`/`ER-15-EP-005`, `TC-15-BVA-009`/`ER-15-BVA-009` |
+| **GitHub Issue** | [#12](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/12) |
+
+**Expected** (per `README.md` FR-15 line 197, oracle): a `category_id` not matching an existing
+category must not end up persisted.
+
+**Actual:** `category_id:999` → persisted as `999` (id 10). `category_id:4` (one past the
+seeded set `{1,2,3}`) → persisted as `4` (id 25). Both confirmed via a follow-up `GET`; no
+category with either id exists (`GET /api/categories` returns only ids 1–3).
+
+**Steps to reproduce:**
+1. Login as admin.
+2. `POST /api/products` with `category_id:999` (or `4`), valid `name`/`price`.
+3. `GET /api/products/:id` — observe the nonexistent `category_id` persisted unchanged.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
+`POST`/`PUT /api/products` bind `category_id` straight into the SQL statement with no existence
+check; no `FOREIGN KEY` from `products.category_id` to `categories.id` (database.js lines
+64–71).
+
+**Evidence:** [`evidence/fr15-raw-execution-log.txt`](evidence/fr15-raw-execution-log.txt),
+sections `TC-15-EP-005`, `TC-15-BVA-009`.
+
+---
+
+## BUG-15-004 — `POST /api/products` has no access control
+
+| Field | Value |
+|---|---|
+| **Severity** | Critical — a security boundary explicitly required by `README.md` FR-12 (lines 176–179) and `SEC-02`/`SEC-03` is completely absent for this endpoint: evidence proves both a fully unauthenticated request and a request authenticated as a non-admin (`role:user`) succeed identically to an admin request, with no compensating control anywhere in the route. |
+| **Priority** | P1 |
+| **Ref** | `TC-15-EP-006`/`ER-15-EP-006`, `TC-15-EP-007`/`ER-15-EP-007` |
+| **GitHub Issue** | [#13](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/13) |
+
+**Expected** (per `README.md` FR-12 lines 176–179 + `SEC-02`/`SEC-03`, oracle):
+`POST /api/products` must require (1) a valid JWT and (2) `role='admin'` in that token; a
+request failing either must be rejected with no product created.
+
+**Actual:** a `POST /api/products` request with **no** `Authorization` header succeeded (`200`,
+product id 11 created). A separate request with a valid `test@eshop.com` JWT (`role:user`)
+also succeeded (`200`, product id 12 created). Both confirmed present via a follow-up
+`GET /api/products`.
+
+**Steps to reproduce:**
+1. `POST /api/products` with a valid body and **no** `Authorization` header — observe `200`
+   and a new product id.
+2. Separately, login as a non-admin user and repeat with that user's JWT — observe the same.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
+line 167, `POST /api/products` — no middleware at all (not even `authenticateToken`, which
+exists and is used elsewhere in the same file, e.g. line 112).
+
+**Evidence:** [`evidence/fr15-raw-execution-log.txt`](evidence/fr15-raw-execution-log.txt),
+sections `TC-15-EP-006`, `TC-15-EP-007`.
+
+---
+
+## BUG-15-005 — `PUT /api/products/:id` has no access control
+
+| Field | Value |
+|---|---|
+| **Severity** | Critical — same security-boundary violation as `BUG-15-004`, on the Update route specifically; proven to allow an unauthenticated actor to silently overwrite an existing product's `name`/`price`/all fields (demonstrated: renamed to `"HACKED"`, price set to `1`). Kept as a separate report from `BUG-15-004` because the fix is a separate code change (middleware added to a different route), even though the defect class is the same. |
+| **Priority** | P1 |
+| **Ref** | `TC-15-EP-008`/`ER-15-EP-008` |
+| **GitHub Issue** | [#14](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/14) |
+
+**Expected** (per `README.md` FR-12 lines 176–179 + `SEC-02`/`SEC-03`, oracle):
+`PUT /api/products/:id` must require a valid JWT with `role='admin'`; otherwise reject with no
+update applied.
+
+**Actual:** `PUT /api/products/13` with **no** `Authorization` header, body
+`{"name":"HACKED","price":1,...}` → `200 {"message":"Product updated"}`.
+`GET /api/products/13` confirmed the product's `name`/`price` were overwritten to
+`"HACKED"`/`1`.
+
+**Steps to reproduce:**
+1. Create a product as admin (or use any existing id).
+2. `PUT /api/products/:id` with **no** `Authorization` header and an arbitrary body.
+3. `GET /api/products/:id` — observe the product was overwritten.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
+line 179, `PUT /api/products/:id` — no middleware at all.
+
+**Evidence:** [`evidence/fr15-raw-execution-log.txt`](evidence/fr15-raw-execution-log.txt),
+section `TC-15-EP-008`.
+
+---
+
+## BUG-15-006 — `DELETE /api/products/:id` has no access control
+
+| Field | Value |
+|---|---|
+| **Severity** | Critical — same security-boundary violation as `BUG-15-004`/`005`, on the Delete route; proven to allow an unauthenticated actor to permanently remove an existing product. Kept separate for the same independent-fix reasoning as `BUG-15-005`. |
+| **Priority** | P1 |
+| **Ref** | `TC-15-EP-009`/`ER-15-EP-009` |
+| **GitHub Issue** | [#15](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/15) |
+
+**Expected** (per `README.md` FR-12 lines 176–179 + `SEC-02`/`SEC-03`, oracle):
+`DELETE /api/products/:id` must require a valid JWT with `role='admin'`; otherwise reject with
+no deletion applied.
+
+**Actual:** `DELETE /api/products/14` with **no** `Authorization` header →
+`200 {"message":"Product deleted"}`. `GET /api/products/14` afterward returned `{}` — the
+product no longer exists.
+
+**Steps to reproduce:**
+1. Create a product as admin (or use any existing id).
+2. `DELETE /api/products/:id` with **no** `Authorization` header.
+3. `GET /api/products/:id` — observe the product is gone.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):** `backend/server.js`
+line 191, `DELETE /api/products/:id` — no middleware at all.
+
+**Evidence:** [`evidence/fr15-raw-execution-log.txt`](evidence/fr15-raw-execution-log.txt),
+section `TC-15-EP-009`.
+
+---
+
+## BUG-15-007 — Admin panel's edit form overwrites every visible product's displayed name
+
+| Field | Value |
+|---|---|
+| **Severity** | Medium — a UI-only correctness defect (the backend's own stored data is correctly isolated, per `ER-15-EP-010` PASS): after editing one product's name in the admin panel, every other product row in the same session's local list is redrawn with the edited product's new name, until the next full refetch/reload. This could mislead an admin into believing multiple products were renamed and acting on that incorrect belief, but self-corrects on any refresh and never reaches the backend. |
+| **Priority** | Medium |
+| **Ref** | `TC-15-EP-011`/`ER-15-EP-011` |
+| **GitHub Issue** | [#16](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/16) |
+
+**Expected** (per `README.md` FR-15 line 198, oracle): editing one product must leave every
+other product's displayed data unchanged.
+
+**Actual:** executed the literal `handleProductSubmit` state-update expression
+(`frontend-admin/src/App.jsx` lines 110–113) via `node -e` against a two-product fixture.
+`products.map(p => ({...p, name: productForm.name}))` overwrote **both** products' `name` to
+the edited product's new name — including the untouched sibling (id 16) — in the array passed
+to `setProducts()`.
+
+**Steps to reproduce:**
+1. Log into the admin panel with at least 2 products visible.
+2. Edit one product's name and submit.
+3. Without reloading, observe every other product row now displays the same (edited) name.
+
+**Root cause (code-derived, for repro clarity only — not the oracle):**
+`frontend-admin/src/App.jsx` lines 108–115: the edit branch of `handleProductSubmit` issues a
+correct, properly-scoped `PUT` (server-side isolation holds, see `ER-15-EP-010`), then locally
+computes `products.map(p => ({...p, name: productForm.name}))` and calls `setProducts(...)`
+with it — applying the edited product's new name to every product in local state — and does
+not call `fetchData()` afterward in this branch (unlike the create branch, line 118, which does
+refetch).
+
+**Evidence:** code-execution capture (no browser-automation tool available in this
+environment) — see `work/FR-15-product-crud/execution-results.md`, `ER-15-EP-011` row, for the
+full `node -e` transcript.
+
+---
+
+## Summary
+
+**Executed:** 20 frozen cases (11 EP + 9 BVA). **PASS:** 7. **FAIL:** 13, all confirmed as real
+defects (no failure was rejected as a test/setup artifact) and grouped into **7 confirmed
+defects**.
+
+**By severity:** Critical — 3 (`BUG-15-004`, `BUG-15-005`, `BUG-15-006`, all missing access
+control on the 3 write endpoints). High — 1 (`BUG-15-002`, `price` validation). Medium — 3
+(`BUG-15-001` `name` validation, `BUG-15-003` `category_id` validation, `BUG-15-007` admin-UI
+edit-isolation).
+
+**Evidence basis:** all 7 confirmed defects are `spec`-grounded — every expected result traces
+directly to a `README.md` citation (FR-15 lines 195–198, or FR-12 lines 176–179 + `SEC-02`/
+`SEC-03`). No assumption-grounded claims and no reclassifications between the two categories in
+this scope (Assumption A1 was used only to pick a concrete BVA value, not as a behavioral
+oracle).
+
+**GitHub filing:** all 7 bugs filed verbatim as GitHub issues
+([#10](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/10)–[#16](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/16)),
+2026-07-06, immediately after human approval — see
+`work/FR-15-product-crud/bug-report-drafts.md` for the approval record.

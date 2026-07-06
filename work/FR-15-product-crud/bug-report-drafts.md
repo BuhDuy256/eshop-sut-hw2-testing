@@ -23,7 +23,7 @@
 | **Repro steps** | 1. Login as admin. 2. `POST /api/products` with `name:""` (or omit `name`, or send a 256-char string), valid `price`/`category_id`. 3. `GET /api/products/:id` for the returned id — observe the invalid `name` persisted unchanged. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `backend/server.js` `POST`/`PUT /api/products` (lines 167–189) bind `name` straight into the SQL statement with no check; `products.name` (database.js line 66) has no `NOT NULL`/`CHECK` constraint. |
 | **Evidence** | `fr15-raw-execution-log.txt`, sections `TC-15-EP-002`, `TC-15-EP-003`, `TC-15-BVA-003` (raw request/response, API-level). |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#10](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/10). |
 
 ## BUG-15-002
 
@@ -39,7 +39,7 @@
 | **Repro steps** | 1. Login as admin. 2. `POST /api/products` with `price:-1` (or `0`, or any negative number), valid `name`/`category_id`. 3. `GET /api/products/:id` — observe the invalid `price` persisted unchanged. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `backend/server.js` `POST`/`PUT /api/products` bind `price` straight into the SQL statement with no check; `products.price` (database.js line 67) is `INTEGER` with no `CHECK (price > 0)`. |
 | **Evidence** | `fr15-raw-execution-log.txt`, sections `TC-15-EP-004`, `TC-15-BVA-004`, `TC-15-BVA-005`. |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#11](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/11). |
 
 ## BUG-15-003
 
@@ -55,7 +55,7 @@
 | **Repro steps** | 1. Login as admin. 2. `POST /api/products` with `category_id:999` (or `4`), valid `name`/`price`. 3. `GET /api/products/:id` — observe the nonexistent `category_id` persisted unchanged. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `backend/server.js` `POST`/`PUT /api/products` bind `category_id` straight into the SQL statement with no existence check; no `FOREIGN KEY` from `products.category_id` to `categories.id` (database.js lines 64–71). |
 | **Evidence** | `fr15-raw-execution-log.txt`, sections `TC-15-EP-005`, `TC-15-BVA-009`. |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#12](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/12). |
 
 ## BUG-15-004
 
@@ -71,7 +71,7 @@
 | **Repro steps** | 1. `POST /api/products` with a valid body and **no** `Authorization` header — observe `200` and a new product id. 2. Separately, login as a non-admin user and repeat with that user's JWT — observe the same. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `backend/server.js` line 167, `POST /api/products` — no middleware at all (not even `authenticateToken`, which exists and is used elsewhere in the same file, e.g. line 112). |
 | **Evidence** | `fr15-raw-execution-log.txt`, sections `TC-15-EP-006`, `TC-15-EP-007`. |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#13](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/13). |
 
 ## BUG-15-005
 
@@ -87,7 +87,7 @@
 | **Repro steps** | 1. Create a product as admin (or use any existing id). 2. `PUT /api/products/:id` with **no** `Authorization` header and an arbitrary body. 3. `GET /api/products/:id` — observe the product was overwritten. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `backend/server.js` line 179, `PUT /api/products/:id` — no middleware at all. |
 | **Evidence** | `fr15-raw-execution-log.txt`, section `TC-15-EP-008`. |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#14](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/14). |
 
 ## BUG-15-006
 
@@ -103,7 +103,7 @@
 | **Repro steps** | 1. Create a product as admin (or use any existing id). 2. `DELETE /api/products/:id` with **no** `Authorization` header. 3. `GET /api/products/:id` — observe the product is gone. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `backend/server.js` line 191, `DELETE /api/products/:id` — no middleware at all. |
 | **Evidence** | `fr15-raw-execution-log.txt`, section `TC-15-EP-009`. |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#15](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/15). |
 
 ## BUG-15-007
 
@@ -119,18 +119,21 @@
 | **Repro steps** | 1. Log into the admin panel with at least 2 products visible. 2. Edit one product's name and submit. 3. Without reloading, observe every other product row now displays the same (edited) name. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | `frontend-admin/src/App.jsx` lines 108–115: the edit branch of `handleProductSubmit` issues a correct, properly-scoped `PUT` (server-side isolation holds, see `ER-15-EP-010`), then locally computes `products.map(p => ({...p, name: productForm.name}))` and calls `setProducts(...)` with it — applying the edited product's new name to every product in local state — and does not call `fetchData()` afterward in this branch (unlike the create branch, line 118, which does refetch). |
 | **Evidence** | `fr15-raw-execution-log.txt` does not cover this case (no HTTP request involved); evidence is the `node -e` execution transcript shown in `work/FR-15-product-crud/execution-results.md`, `ER-15-EP-011` row — a **code-execution capture**, not a browser screenshot, since no browser-automation tool was available in this environment. |
-| **Status** | draft — pending human approval. |
+| **Status** | `approved` — promoted to `out/reports/FR-15-product-crud/bug-reports/report.md`, filed as [#16](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/16). |
 
 ## Human gate: `approve → file`
 
-- [ ] Approve `BUG-15-001` (name validation missing)
-- [ ] Approve `BUG-15-002` (price validation missing)
-- [ ] Approve `BUG-15-003` (category_id validation missing)
-- [ ] Approve `BUG-15-004` (POST no access control)
-- [ ] Approve `BUG-15-005` (PUT no access control)
-- [ ] Approve `BUG-15-006` (DELETE no access control)
-- [ ] Approve `BUG-15-007` (admin-UI edit-isolation)
+- [x] Approve `BUG-15-001` (name validation missing) → filed [#10](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/10)
+- [x] Approve `BUG-15-002` (price validation missing) → filed [#11](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/11)
+- [x] Approve `BUG-15-003` (category_id validation missing) → filed [#12](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/12)
+- [x] Approve `BUG-15-004` (POST no access control) → filed [#13](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/13)
+- [x] Approve `BUG-15-005` (PUT no access control) → filed [#14](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/14)
+- [x] Approve `BUG-15-006` (DELETE no access control) → filed [#15](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/15)
+- [x] Approve `BUG-15-007` (admin-UI edit-isolation) → filed [#16](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/16)
 
-**Pending human approval** — per-report, not blanket. GitHub Issues are enabled and `gh` is
-authenticated (`docs/implementation-plan/blockers.md` addendum), so any bug approved here can
-be filed as a real GitHub issue immediately after promotion.
+**Approved 2026-07-06** (all 7, blanket per-report review — user replied "Approve." to the full
+set presented; no report was held back). Promoted verbatim to
+`out/reports/FR-15-product-crud/bug-reports/report.md`; no technical field (title, severity,
+priority, expected, actual, repro, root cause, evidence) was changed between draft and
+promoted/filed versions — only each draft's `Status` line below and this gate section were
+updated.

@@ -103,14 +103,14 @@ no defensible reframing; logged as an observation, not a modeled oracle).
 
 ## Human review
 
-- [ ] **Gate: `completeness_confirmed`** — checklist:
-  - [ ] Domain complete for `name`, `price`, `category_id`
-  - [ ] Boundary complete (spec-derived **and** impl-derived boundaries present for all three)
-  - [ ] Oracle frozen or backed by an accepted assumption for every entry
-  - [ ] Assumptions logged and reviewed (A1 accepted, A2 rejected)
-  - [ ] Forbidden state present (actor/role for CUD, citing FR-12 + SEC-02/SEC-03)
-  - [ ] Edit-isolation postcondition present, both enforcement paths recorded
-  - [ ] Scope check: no FR-16, no product search/listing, no FR-14 category-deletion cascade
+- [x] **Gate: `completeness_confirmed`** — checklist:
+  - [x] Domain complete for `name`, `price`, `category_id`
+  - [x] Boundary complete (spec-derived **and** impl-derived boundaries present for all three)
+  - [x] Oracle frozen or backed by an accepted assumption for every entry
+  - [x] Assumptions logged and reviewed (A1 accepted, A2 rejected)
+  - [x] Forbidden state present (actor/role for CUD, citing FR-12 + SEC-02/SEC-03)
+  - [x] Edit-isolation postcondition present, both enforcement paths recorded
+  - [x] Scope check: no FR-16, no product search/listing, no FR-14 category-deletion cascade
     folded in
 
-  **Pending human approval.**
+  **Approved 2026-07-06** (user: "Proceed.").
