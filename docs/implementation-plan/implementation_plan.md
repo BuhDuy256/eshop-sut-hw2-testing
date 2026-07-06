@@ -261,8 +261,23 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
    FR-08, FR-15, FR-17; the assigned coupon feature is FR-17, a different admin-CRUD feature).
    That content was removed from FR-08's deliverables; GitHub issues #3-#5 (already filed for
    the 3 removed bugs) are left open on GitHub as real findings, just outside graded scope.
-2. FR-15, then FR-17 (through skills). **Not started.**
-3. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Not started.**
+2. ~~FR-15, then FR-17 (through skills).~~
+   **FR-15 done, 2026-07-06.** Built the Testing Model from scratch via `domain-test-design`
+   Stage 1-2 (`name`, `price`, `category_id`, an actor/role forbidden state for
+   Create/Update/Delete citing README FR-12 + SEC-02/SEC-03 directly — no assumption needed —
+   and an edit-isolation postcondition with a second, admin-frontend enforcement path found
+   during modeling), human-approved (`completeness_confirmed`). Designed 11 EP + 9 BVA cases
+   (Stage 3-4), genuinely re-checked Stage 5 and skipped the Decision Table (no conditions
+   combine), froze and committed all 20 before execution. Executed via Model C against the live
+   SUT (manual `node` start — Docker Desktop was unreachable this session); confirmed all 13
+   FAILs as real defects via `bug-reporting`, grouped into 7 confirmed defects (3 Critical —
+   `POST`/`PUT`/`DELETE /api/products` all lack any access control whatsoever; 1 High — `price`
+   accepts negative/zero; 3 Medium — `name`/`category_id` validation missing, and the admin
+   panel's edit form locally overwrites every visible product's name, not just the edited one).
+   All approved and filed as GitHub issues #10-#16. FR-17 next. See
+   `work/FR-15-product-crud/*` and the AI Audit (`[AI-02]`, Artifacts #15-18) for full detail.
+3. FR-17 (through skills). **Not started.**
+4. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Not started.**
 
 ---
 
@@ -295,8 +310,8 @@ baseline is consistent across plan/artifacts/git history, all exit criteria carr
 both skills are extracted/validated/smell-tested through two review rounds, and all three
 Human Gates + structural guards are demonstrated by real execution — not just asserted.
 
-**Paused here by explicit request** — Continuation has not started yet in this session. When
-resumed, the first Continuation task is: **FR-08 full**, driven through the two frozen skills
-(`domain-test-design`, `bug-reporting`) as a user of the framework, not as further tuning of
-it (stresses the decision-table path via FR-09's 5 combined coupon conditions). See the
-"Continuation" section above for the baseline-protection rule that applies from here on.
+**FR-08 Full and FR-15 are both done** (see "Continuation" section above). **FR-17 (Coupon
+Management CRUD) is next** — the last of the 4 assigned features, driven through the same two
+frozen skills. See the "Continuation" section above for the baseline-protection rule (Steps
+0–6, FR-08 Full, and FR-15's frozen artifacts are not to be retroactively edited except for a
+genuine defect) that applies from here on.
