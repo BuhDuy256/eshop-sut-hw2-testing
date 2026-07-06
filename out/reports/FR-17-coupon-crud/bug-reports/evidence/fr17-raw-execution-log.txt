@@ -1,0 +1,306 @@
+
+===== TC-17-EP-001 Happy path create =====
+
+--- EP-001 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","max_uses_per_user":2}
+RESPONSE: {"message":"Coupon created","id":5}
+HTTP_STATUS:200
+
+--- EP-001 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2}]
+HTTP_STATUS:200
+
+===== TC-17-EP-002 code duplicate =====
+
+--- EP-002 create throwaway DUPTEST1 ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":6}
+HTTP_STATUS:200
+
+--- EP-002 create duplicate DUPTEST1 ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"DUPTEST1","type":"fixed","discount_value":5000,"min_order_amount":0,"expired_at":"2099-01-01","max_uses_per_user":1}
+RESPONSE: {"error":"SQLITE_CONSTRAINT: UNIQUE constraint failed: coupons.code"}
+HTTP_STATUS:500
+
+--- EP-002 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-003 code omitted =====
+
+--- EP-003 create no code ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":7}
+HTTP_STATUS:200
+
+--- EP-003 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-004 type invalid discount =====
+
+--- EP-004 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":8}
+HTTP_STATUS:200
+
+--- EP-004 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-005 type omitted =====
+
+--- EP-005 create no type ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST005","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":9}
+HTTP_STATUS:200
+
+--- EP-005 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-006 discount_value -1000 =====
+
+--- EP-006 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":10}
+HTTP_STATUS:200
+
+--- EP-006 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-007 expired_at omitted =====
+
+--- EP-007 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":11}
+HTTP_STATUS:200
+
+--- EP-007 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-008 min_order_amount -500 =====
+
+--- EP-008 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":12}
+HTTP_STATUS:200
+
+--- EP-008 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-009 min_order_amount omitted =====
+
+--- EP-009 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST009","type":"percent","discount_value":10,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":13}
+HTTP_STATUS:200
+
+--- EP-009 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-010 max_uses_per_user -5 =====
+
+--- EP-010 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":-5}
+RESPONSE: {"message":"Coupon created","id":14}
+HTTP_STATUS:200
+
+--- EP-010 verify ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5}]
+HTTP_STATUS:200
+
+===== TC-17-EP-011 GET no Authorization header =====
+
+--- EP-011 ---
+REQUEST: -X GET http://localhost:3000/api/coupons
+RESPONSE: {"error":"Unauthorized"}
+HTTP_STATUS:401
+
+===== TC-17-EP-012 GET role=user =====
+
+--- EP-012 ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODMzNzgxNjd9.0V0rzaP6fBgzzyeLBTS4VgB9PYOx9vI5mO3yh4v05JI
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5}]
+HTTP_STATUS:200
+
+===== TC-17-EP-013 POST no Authorization header =====
+
+--- EP-013 create attempt ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -d {"code":"UNAUTHCR8","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1} -H Content-Type: application/json
+RESPONSE: {"error":"Unauthorized"}
+HTTP_STATUS:401
+
+--- EP-013 verify (admin) ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5}]
+HTTP_STATUS:200
+
+===== TC-17-EP-014 POST role=user =====
+
+--- EP-014 create attempt ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODMzNzgxNjd9.0V0rzaP6fBgzzyeLBTS4VgB9PYOx9vI5mO3yh4v05JI -H Content-Type: application/json -d {"code":"USERROLECR8","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":15}
+HTTP_STATUS:200
+
+--- EP-014 verify (admin) ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5},{"id":15,"code":"USERROLECR8","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-015 DELETE no Authorization header =====
+
+--- EP-015 create throwaway ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"DELTHROW1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":16}
+HTTP_STATUS:200
+
+--- EP-015 verify list before delete attempt ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5},{"id":15,"code":"USERROLECR8","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":16,"code":"DELTHROW1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-EP-015 DELETE no Authorization header (attempt) =====
+
+--- EP-015 delete attempt (no auth) ---
+REQUEST: -X DELETE http://localhost:3000/api/admin/coupons/16
+RESPONSE: {"error":"Unauthorized"}
+HTTP_STATUS:401
+
+--- EP-015 verify (admin) throwaway still exists ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5},{"id":15,"code":"USERROLECR8","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":16,"code":"DELTHROW1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
+
+===== TC-17-BVA-001 discount_value=-1 =====
+
+--- BVA-001 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST001","type":"percent","discount_value":-1,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":17}
+HTTP_STATUS:200
+
+===== TC-17-BVA-002 discount_value=0 =====
+
+--- BVA-002 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST002","type":"percent","discount_value":0,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":18}
+HTTP_STATUS:200
+
+===== TC-17-BVA-003 discount_value=1 =====
+
+--- BVA-003 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST003","type":"percent","discount_value":1,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":19}
+HTTP_STATUS:200
+
+===== TC-17-BVA-004 min_order_amount=-1 =====
+
+--- BVA-004 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST004","type":"percent","discount_value":10,"min_order_amount":-1,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":20}
+HTTP_STATUS:200
+
+===== TC-17-BVA-005 min_order_amount=0 =====
+
+--- BVA-005 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST005","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":21}
+HTTP_STATUS:200
+
+===== TC-17-BVA-006 min_order_amount=1 =====
+
+--- BVA-006 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST006","type":"percent","discount_value":10,"min_order_amount":1,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":22}
+HTTP_STATUS:200
+
+===== TC-17-BVA-007 max_uses_per_user=0 =====
+
+--- BVA-007 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":0}
+RESPONSE: {"message":"Coupon created","id":23}
+HTTP_STATUS:200
+
+===== TC-17-BVA-008 max_uses_per_user=null =====
+
+--- BVA-008 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST008","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":null}
+RESPONSE: {"message":"Coupon created","id":24}
+HTTP_STATUS:200
+
+===== TC-17-BVA-009 max_uses_per_user omitted =====
+
+--- BVA-009 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST009","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30"}
+RESPONSE: {"message":"Coupon created","id":25}
+HTTP_STATUS:200
+
+===== TC-17-BVA-010 max_uses_per_user=-1 =====
+
+--- BVA-010 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":-1}
+RESPONSE: {"message":"Coupon created","id":26}
+HTTP_STATUS:200
+
+===== TC-17-BVA-011 max_uses_per_user=1 =====
+
+--- BVA-011 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST011","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":27}
+HTTP_STATUS:200
+
+===== TC-17-BVA-012 max_uses_per_user=2 =====
+
+--- BVA-012 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST012","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":2}
+RESPONSE: {"message":"Coupon created","id":28}
+HTTP_STATUS:200
+
+===== TC-17-BVA-013 type=percent =====
+
+--- BVA-013 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST013","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":29}
+HTTP_STATUS:200
+
+===== TC-17-BVA-014 type=fixed =====
+
+--- BVA-014 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST014","type":"fixed","discount_value":10000,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":30}
+HTTP_STATUS:200
+
+===== TC-17-BVA-015 type=Percent (case variant) =====
+
+--- BVA-015 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST015","type":"Percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":31}
+HTTP_STATUS:200
+
+===== TC-17-BVA-016 expired_at=empty string =====
+
+--- BVA-016 create ---
+REQUEST: -X POST http://localhost:3000/api/admin/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU -H Content-Type: application/json -d {"code":"BVATEST016","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"","max_uses_per_user":1}
+RESPONSE: {"message":"Coupon created","id":32}
+HTTP_STATUS:200
+
+===== FINAL STATE — full coupon list =====
+
+--- final GET ---
+REQUEST: -X GET http://localhost:3000/api/coupons -H Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgzMzc4MTY2fQ.dBgiYIS4RSyfeIJoHGhAEtAScLntasqznYEGb3R1lgU
+RESPONSE: [{"id":1,"code":"SAVE10","type":"percent","discount_value":10,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":2,"code":"BIGBUY","type":"fixed","discount_value":50000,"min_order_amount":500000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":1},{"id":3,"code":"VIP100","type":"fixed","discount_value":100000,"min_order_amount":300000,"expired_at":"2099-12-31","is_active":1,"max_uses_per_user":2},{"id":4,"code":"EXPIRED","type":"percent","discount_value":20,"min_order_amount":100000,"expired_at":"2020-01-01","is_active":1,"max_uses_per_user":1},{"id":5,"code":"EPTEST001","type":"percent","discount_value":15,"min_order_amount":200000,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":6,"code":"DUPTEST1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":7,"code":null,"type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":8,"code":"EPTEST004","type":"discount","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":9,"code":"EPTEST005","type":null,"discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":10,"code":"EPTEST006","type":"fixed","discount_value":-1000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":11,"code":"EPTEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":null,"is_active":1,"max_uses_per_user":1},{"id":12,"code":"EPTEST008","type":"percent","discount_value":10,"min_order_amount":-500,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":13,"code":"EPTEST009","type":"percent","discount_value":10,"min_order_amount":null,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":14,"code":"EPTEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-5},{"id":15,"code":"USERROLECR8","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":16,"code":"DELTHROW1","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":17,"code":"BVATEST001","type":"percent","discount_value":-1,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":18,"code":"BVATEST002","type":"percent","discount_value":0,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":19,"code":"BVATEST003","type":"percent","discount_value":1,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":20,"code":"BVATEST004","type":"percent","discount_value":10,"min_order_amount":-1,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":21,"code":"BVATEST005","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":22,"code":"BVATEST006","type":"percent","discount_value":10,"min_order_amount":1,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":23,"code":"BVATEST007","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":24,"code":"BVATEST008","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":25,"code":"BVATEST009","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":26,"code":"BVATEST010","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":-1},{"id":27,"code":"BVATEST011","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":28,"code":"BVATEST012","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":2},{"id":29,"code":"BVATEST013","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":30,"code":"BVATEST014","type":"fixed","discount_value":10000,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":31,"code":"BVATEST015","type":"Percent","discount_value":10,"min_order_amount":0,"expired_at":"2099-06-30","is_active":1,"max_uses_per_user":1},{"id":32,"code":"BVATEST016","type":"percent","discount_value":10,"min_order_amount":0,"expired_at":"","is_active":1,"max_uses_per_user":1}]
+HTTP_STATUS:200
