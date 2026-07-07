@@ -7,6 +7,7 @@
 | **Name:** | Nguyen Bao Duy |
 | **Student ID:** | 23127179 |
 | **Class:** | 23KTPM2 |
+| **GitHub Repo:** | [BuhDuy256/eshop-sut-hw2-testing](https://github.com/BuhDuy256/eshop-sut-hw2-testing) |
 
 ## 2. Self-assessment table
 
