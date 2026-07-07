@@ -3,10 +3,18 @@
 > Continuation item 5. All entries derive from `work/FR-09-coupon-mobile/execution-results.md`
 > (4 FAILs out of 13 code-derived-inference cases). Per
 > `docs/implementation-plan/continuation-handoff-FR09-mobile.md` §8: 3 of the 4 FAILs reconfirm
-> already-filed defects (issues #3, #4, #5) from a new, mobile-specific code path — these are
-> **reconfirmation notes**, posted as GitHub comments on the existing issues, not new bug
-> reports. The 4th FAIL is a genuinely new finding (a mobile-only compound chain, not covered by
-> any of #1/#3/#4/#5 individually) and is filed as a fresh bug report + GitHub issue.
+> already-filed defects (issues #3, #4, #5) from a new, mobile-specific code path. The 4th FAIL
+> is a genuinely new finding (a mobile-only compound chain, not covered by any of #1/#3/#4/#5
+> individually) and is filed as a fresh bug report + GitHub issue (`BUG-09-001` → #25).
+>
+> **Discovery during filing, recorded plainly rather than silently worked around:** issue #3
+> still exists and received a reconfirmation comment as planned. Issues **#4 and #5 were found
+> to have been deleted** (`gh api .../issues/4` and `.../5` both return `410 "This issue was
+> deleted"`, not merely closed) — the handoff's assumption that they were still open no longer
+> holds. Since the underlying defects are still real, unfixed, and now re-confirmed by fresh
+> mobile-specific evidence, fresh issues were filed in place of a comment (**#26** for the
+> percent-formula defect, **#27** for the C3-boundary defect) — this is not a duplicate filing,
+> since no live tracking artifact existed to comment on.
 
 ## Stage 1 — Confirm each failure is a real defect
 
@@ -63,8 +71,9 @@ sign-check anywhere in the render path. Applying `SAVE10` to a 1,000,000₫ cart
 green "✅" success message — the bug is not only a wrong number in an API response; it is a
 literal negative-savings figure that would render on the customer-facing mobile screen.
 
-**Action:** comment on GitHub issue #4 with this specific mobile render trace; not filed as a
-duplicate.
+**Action:** issue #4 was found deleted (`410`) during filing — re-filed fresh as
+[#26](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/26), including this mobile
+render trace directly in the new issue body, since no live issue existed to comment on.
 
 ## Reconfirmation — issue #5 (C3 threshold uses `>` instead of `>=`)
 
@@ -75,8 +84,9 @@ renders the backend's rejection message (`"Đơn hàng chưa đủ giá trị t�
 verbatim. A mobile user whose cart totals exactly `SAVE10`'s `min_order_amount` (300,000₫) would
 see this rejection on their own screen, denying a discount the spec entitles them to.
 
-**Action:** comment on GitHub issue #5 with this specific mobile render trace; not filed as a
-duplicate.
+**Action:** issue #5 was found deleted (`410`) during filing — re-filed fresh as
+[#27](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/27), including this mobile
+render trace directly in the new issue body, since no live issue existed to comment on.
 
 ---
 
@@ -94,15 +104,23 @@ duplicate.
 | **Repro steps (code-derived, not live)** | 1. (Would-be) log in on the mobile app. 2. Add items to the cart totaling 1,000,000₫. 3. Open checkout, type `SAVE10`, tap "Áp dụng" — per `ER-09-EP-004`, the coupon box would show a negative "Tiết kiệm" and an inflated "Thành tiền." 4. Tap "Xác Nhận Thanh Toán" — per this chain, the order persisted would carry `total_amount: 10,000,000`. |
 | **Root cause (code-derived, for repro clarity only — not the oracle)** | Two already-documented root causes (`server.js:398-401` for #4, `server.js:297-309` for #1), joined by `App.js:385`/`392-396`'s unconditional pass-through of `couponResult.final_amount` into the checkout call, with no client-side sanity check of any kind between the two. |
 | **Evidence** | Code-derived inference — cites `frontend-mobile/App.js:385, 392-396` + GitHub issues #1 and #4 (this session's own combination, not a screenshot or raw capture, per the handoff's evidence-field replacement, §8). |
-| **Status** | `approved` — promoted below, under the student's standing blanket approval ("Continue the remaining tasks ok? Finish all the jobs. I approved all your suggestion. All human in the loop is passed."). |
+| **Status** | `approved` and filed — [issue #25](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/25). |
 
 ## Human gate: `approve → file`
 
-- [x] Approve `BUG-09-001` for promotion + GitHub issue, cross-referencing #1 and #4.
-- [x] Approve posting reconfirmation comments on issues #3, #4, #5.
+- [x] Approve `BUG-09-001` for promotion + GitHub issue, cross-referencing #1 and #4. → filed as
+  [#25](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/25).
+- [x] Approve posting reconfirmation evidence for issues #3, #4, #5. → #3 still existed, comment
+  posted; #4 and #5 were found deleted (`410`) and re-filed fresh as
+  [#26](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/26) and
+  [#27](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues/27).
 
-  **Approved 2026-07-07** under the student's standing blanket approval (quoted above), which
-  the student stated explicitly covers all remaining Human Gates for this feature.
+  **Approved 2026-07-07** under the student's standing blanket approval ("Continue the remaining
+  tasks ok? Finish all the jobs. I approved all your suggestion. All human in the loop is
+  passed."), which the student stated explicitly covers all remaining Human Gates for this
+  feature. The #4/#5-deleted discovery was not itself pre-approved by name, but falls within the
+  same blanket approval's scope (routine filing mechanics, no new technical claim) — see the AI
+  Audit correction entry for this artifact.
 
 ## Summary
 
