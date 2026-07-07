@@ -294,9 +294,13 @@ After Step 6 the pipeline, contracts, and both skills are validated. Then, reusi
    bug by proven read-vs-write impact; 5 Medium — `code`/`type`/`expired_at`/`min_order_amount`
    zero validation, plus the `max_uses_per_user` asymmetric-fallback logic bug). All approved
    and filed as GitHub issues #17-#24. See `work/FR-17-coupon-crud/*` and the AI Audit
-   (`[AI-02]`, Artifacts #19-22) for full detail. **All 4 assigned features (FR-04, FR-08,
-   FR-15, FR-17) are now complete.**
-4. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Not started — next action.**
+   (`[AI-02]`, Artifacts #19-22) for full detail. **Correction, 2026-07-07:** FR-17 turned out
+   to be the wrong Pool-D feature (see `docs/implementation-plan/blockers.md`'s correction
+   addendum) — it has no mobile UI and cannot genuinely be tested via Mobile as Pool D
+   requires. This work is **not deleted**, stands as real extra testing, but is **no longer
+   the graded 4th feature**. FR-09 (below) replaces it.
+4. Globals: `out/README.md` self-assessment + test summary; `out/ai-critique.md` (from logged corrections); finalize `[AI-02]/[AI-03]/[AI-05]`; `git log --oneline > out/git_commit_log.txt`; record one end-to-end skill demo video (§7). **Done** for the FR-04/08/15/17 scope as it stood 2026-07-07; self-assessment table and test summary need a follow-up pass once FR-09 (below) is complete.
+5. **FR-09 (Discount coupons), tested via Mobile — the corrected 4th assigned feature (Pool D).** **Not started.** Full self-contained handoff: `docs/implementation-plan/continuation-handoff-FR09-mobile.md`. Prior-art reference (Testing Model, EP+BVA+Decision Table, 3 confirmed bugs already filed as issues #3-#5): `git show 4ab06d2~1:work/FR-08-checkout/testing-model.md` (and the sibling `out/reports/FR-08-checkout/*` paths at that same commit) — this content was correctly removed from FR-08's scope on 2026-07-06 (it was never FR-08's), but its modeling of FR-09's own C1-C5 conditions and discount formula is directly reusable, now that FR-09 is genuinely in scope. Must be redesigned for mobile-UI execution (tap/screenshot), not raw API calls.
 
 ---
 
@@ -329,10 +333,12 @@ baseline is consistent across plan/artifacts/git history, all exit criteria carr
 both skills are extracted/validated/smell-tested through two review rounds, and all three
 Human Gates + structural guards are demonstrated by real execution — not just asserted.
 
-**FR-08 Full, FR-15, and FR-17 are all done** (see "Continuation" section above). **All 4
-assigned features are complete.** Remaining work is the Continuation item 4 globals: `out/
-README.md` self-assessment + test summary, `out/ai-critique.md`, finalizing `[AI-02]/[AI-03]/
-[AI-05]`, `git log --oneline > out/git_commit_log.txt`, and the end-to-end skill demo video.
-See the "Continuation" section above for the baseline-protection rule (Steps 0–6 and all four
-features' frozen artifacts are not to be retroactively edited except for a genuine defect) that
-applies from here on.
+**FR-08 Full, FR-15, and FR-17 are all done** (see "Continuation" section above). **Correction,
+2026-07-07: FR-17 is not actually the 4th graded feature** — see
+`docs/implementation-plan/blockers.md`'s correction addendum. The real 4th feature (Pool D) is
+**FR-09 (Discount coupons), tested via Mobile** — not started. Full handoff:
+`docs/implementation-plan/continuation-handoff-FR09-mobile.md`. Globals (item 4) are done for
+the FR-04/08/15/17 scope but need a follow-up pass on the self-assessment table/test summary
+once FR-09 is complete. See the "Continuation" section above for the baseline-protection rule
+(Steps 0–6 and all frozen artifacts — including FR-17's, kept as extra work — are not to be
+retroactively edited except for a genuine defect) that applies from here on.
