@@ -6,11 +6,6 @@
 > for C2 (expiry). C1 and C4 are presence/enum-shaped, already exercised by the EP cases in the
 > sibling `domain-testing/report.md` (`TC-09-EP-001`, `TC-09-EP-003`) — no separate BVA case, per
 > the over-partitioning guard.
->
-> **Evaluation-method note (applies to every case below):** evaluated by code-derived inference
-> from `frontend-mobile/App.js`, combined with an already-confirmed backend defect where one
-> applies — never by live mobile execution. `Expected` states only the spec-correct behavior;
-> the inferred `actual` lives in `work/FR-09-coupon-mobile/execution-results.md`.
 
 ## Boundary set 1 — C3, order threshold (`min_order_amount`), coupon `SAVE10` (300,000₫)
 

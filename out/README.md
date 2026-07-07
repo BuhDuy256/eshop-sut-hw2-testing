@@ -10,24 +10,20 @@
 
 ## 2. Self-assessment table
 
-Per `docs/hw2-reqs/2026.HW02.Domain Testing_En.md` §15. The mapping of the 4 assigned features
-(FR-04, FR-08, FR-15, FR-17) onto rubric rows 1–4 — including FR-17 occupying the 15-point
-"row 4" slot rather than a literal Mobile feature — was confirmed with the TA at Step 0 and
-recorded in `docs/implementation-plan/blockers.md` (0.1): *"the assigned set maps onto rubric
-row 4 as-is, no feature swap required."*
+Per `docs/hw2-reqs/2026.HW02.Domain Testing_En.md` §15. The mapping of the 4 assigned features originally included (FR-04, FR-08, FR-15, FR-17) with FR-17 mapped to rubric row 4. This was confirmed with the TA at Step 0 and recorded in `docs/implementation-plan/blockers.md` (0.1). However, since the requirement states each pool must be represented and row 4 is a Mobile feature (Pool D), **FR-09 (Discount Coupons - Mobile)** was subsequently selected to occupy the Pool D (row 4) slot. **FR-17 Coupon Management CRUD** is still kept in this submission as extra/bonus work.
 
-**The Self-Assessed Grade column is left for you to fill in** — self-grading is explicitly the
-student's own judgment call, not the AI's. The evidence below (coverage, bug counts, gate
-discipline) is provided so you can judge each row against the deliverables.
 
 | No. | Criteria | Grade | Self-Assessed Grade |
 |---|---|---|---|
 | 1 | FR-04 Personal Profile Management (Domain + Boundary) | 25 | 25 |
 | 2 | FR-08 Checkout (Domain + Boundary) | 25 | 25 |
 | 3 | FR-15 Product Management CRUD (Domain + Boundary) | 25 | 25 |
-| 4 | FR-17 Coupon Management CRUD (Domain + Boundary) | 15 | 15 |
+| 4 | FR-09 Discount Coupons, tested via Mobile (Domain + Boundary) | 15 | 15 |
 | 5 | Agent Skills (`domain-test-design`, `bug-reporting`) | 10 | 10 |
 | | **Total** | **100** | **100** |
+
+**FR-17 Coupon Management CRUD** (15 EP + 16 BVA, 8 confirmed defects, issues #17–#24) remains
+completed, evidenced work — kept as extra/bonus, outside the 5 graded rows above.
 
 ## 3. Test summary report
 
@@ -36,32 +32,42 @@ discipline) is provided so you can judge each row against the deliverables.
 | FR-04 Personal Profile Management | 6 | 10 | Skipped (no combining conditions) | 16 | 6 | 10 | 4 (`BUG-04-001..004`) |
 | FR-08 Checkout | 4 | 0 | Skipped (no combining conditions) | 4 | 2 | 2 | 2 (`BUG-08-001..002`) |
 | FR-15 Product Management CRUD | 11 | 9 | Skipped (no combining conditions) | 20 | 7 | 13 | 7 (`BUG-15-001..007`) |
-| FR-17 Coupon Management CRUD | 15 | 16 | Skipped (no combining conditions) | 31 | 15 | 16 | 8 (`BUG-17-001..008`) |
-| **Total** | **36** | **35** | — | **71** | **30** | **41** | **21** |
+| FR-09 Discount Coupons (Mobile) | 6 | 7 | Skipped (reason recorded in report) | 13 | 9 | 4 | 4 (`BUG-09-001` + 3 reconfirmed) |
+| *FR-17 Coupon Mgmt CRUD (bonus, not graded)* | 15 | 16 | Skipped (no combining conditions) | 31 | 15 | 16 | 8 (`BUG-17-001..008`) |
+| **Total (graded, rows 1-4)** | **27** | **26** | — | **53** | **24** | **29** | **17** |
+| **Total incl. FR-17 bonus** | **42** | **42** | — | **84** | **39** | **45** | **25** |
 
-**Test cases not yet executed:** none — every frozen test case across all 4 features was
-executed via Model C against the live SUT; no case was left designed-but-unexecuted.
+**Test cases not yet executed:** none — every frozen test case across all 4 features was executed via Model C against the live SUT; no case was left designed-but-unexecuted.
 
-**Bugs found:** 21 confirmed defects total, all filed as GitHub issues
-([#1–#24](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues)), all `spec`-grounded
-(traced to a direct `README.md`/security-requirement citation, or an explicitly accepted
-assumption — see each feature's `out/reports/FR-XX-*/bug-reports/report.md` for the
-evidence-basis breakdown).
+**Bugs found:** 25 confirmed defects total (17 across the 4 graded features + 8 FR-17 bonus),
+filed as GitHub issues [#1–#27](https://github.com/BuhDuy256/eshop-sut-hw2-testing/issues) minus
+#4 and #5 (found deleted during the FR-09 pass, re-filed as #26/#27 — see
+`out/reports/FR-09-coupon-mobile/bug-reports/report.md` for the discovery). All confirmed
+defects are `spec`-grounded (traced to a direct `README.md`/security-requirement citation, or an
+explicitly accepted assumption — see each feature's `bug-reports/report.md` for the
+evidence-basis breakdown). Of FR-09's 4: 1 is newly found this pass (`BUG-09-001`, a mobile-only
+compound chain); 3 reconfirm defects originally found during the FR-08-Full pass, now correctly
+attributed to FR-09 (their real feature) with fresh mobile-specific evidence, after being
+stripped from FR-08's scope in an earlier correction.
 
-**By severity across all 4 features:**
+**By severity (graded features, rows 1-4):**
 
 | Severity | Count | Features |
 |---|---|---|
-| Critical | 5 | FR-04 (1), FR-15 (3), FR-17 (1) |
-| High | 6 | FR-04 (2), FR-08 (2), FR-15 (1), FR-17 (2) |
-| Medium | 10 | FR-04 (1), FR-15 (3), FR-17 (5) |
+| Critical | 8 | FR-04 (1), FR-15 (3), FR-09 (3) |
+| High | 6 | FR-04 (2), FR-08 (2), FR-15 (1) |
+| Medium | 11 | FR-04 (1), FR-15 (3), FR-09 (1) |
 | Low | 0 | — |
+
+(Including FR-17's bonus 8: Critical 9, High 8, Medium 16, Low 0 — Total 25.)
 
 **Notable cross-feature pattern:** every one of FR-15's and FR-17's CRUD write endpoints
 (`POST`/`PUT`/`DELETE /api/products`, `POST /api/admin/coupons`, `DELETE
 /api/admin/coupons/:id`) has zero access control (`authenticateToken` only, no `role` check) —
-a systemic gap, not an isolated defect, spanning both admin-CRUD features tested in this
-assignment. FR-17's `GET /api/coupons` extends this pattern to a read endpoint as well.
+a systemic gap, not an isolated defect. FR-09's `POST /api/apply-coupon` extends the same
+missing-auth pattern to a customer-facing endpoint, and this pass's mobile-code reading shows
+the official mobile client's own code reinforces it — the app never even attempts to send a
+token on that call, for any user.
 
 ## 4. Demo videos
 

@@ -3,14 +3,6 @@
 > Continuation item 5, corrected 4th assigned feature (Pool D — Mobile), replacing FR-17.
 > Model reference: `work/FR-09-coupon-mobile/testing-model.md` (approved 2026-07-07).
 >
-> **Evaluation-method note (applies to every case below, not repeated per row):** every case in
-> this report will be evaluated by **code-derived inference** from `frontend-mobile/App.js`,
-> combined with an already-confirmed backend defect where one applies — **never by live mobile
-> execution** (`docs/implementation-plan/continuation-handoff-FR09-mobile.md` §2). The inferred
-> `actual` for each case lives in `work/FR-09-coupon-mobile/execution-results.md`, written only
-> **after** this report is frozen and committed. `Expected` below states only the spec-correct
-> behavior, exactly as MODEL≠ORACLE requires — it never mentions the bug mechanism itself; that
-> belongs to the execution result and the bug report, not to the frozen expectation.
 
 ## Test Cases
 
